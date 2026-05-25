@@ -9,8 +9,11 @@ Antigravity / Claude Code skill pack cho **FARE** — bộ 6 agent + 22 skill + 
 ## Cài đặt 1 phút
 
 ```bash
-# Tại workspace bạn muốn cài (default = thư mục hiện tại)
+# Cách 1 — qua npm registry (nhanh, ngắn gọn)
 npx fare-skill-pack init
+
+# Cách 2 — install thẳng từ GitHub (không cần npm publish, dùng được cho version chưa release)
+npx github:bacng95/fare-skill-pack init
 ```
 
 CLI sẽ:
