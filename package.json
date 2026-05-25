@@ -13,7 +13,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "prepack": "node bin/prepack.mjs",
+    "prepare": "node bin/prepack.mjs",
     "test:pack": "npm pack --dry-run"
   },
   "engines": {
