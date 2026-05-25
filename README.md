@@ -1,4 +1,4 @@
-# @fare/skill-pack
+# fare-skill-pack
 
 Antigravity / Claude Code skill pack cho **FARE** — bộ 6 agent + 22 skill + 16 workflow giúp dev đỡ vai BA · PM · QA · Dev khi vận hành FARE qua MCP.
 
@@ -10,7 +10,7 @@ Antigravity / Claude Code skill pack cho **FARE** — bộ 6 agent + 22 skill + 
 
 ```bash
 # Tại workspace bạn muốn cài (default = thư mục hiện tại)
-npx @fare/skill-pack init
+npx fare-skill-pack init
 ```
 
 CLI sẽ:
@@ -54,12 +54,12 @@ Phủ trọn vòng đời: yêu cầu → thiết kế → code → test → gro
 ## CLI
 
 ```bash
-npx @fare/skill-pack init [target]         # Cài lần đầu
-npx @fare/skill-pack update [target]       # Cập nhật version mới (backup tự động)
-npx @fare/skill-pack uninstall [target]    # Gỡ
-npx @fare/skill-pack register-mcp          # Chỉ in lệnh register MCP
-npx @fare/skill-pack help                  # Trợ giúp
-npx @fare/skill-pack version               # Phiên bản
+npx fare-skill-pack init [target]         # Cài lần đầu
+npx fare-skill-pack update [target]       # Cập nhật version mới (backup tự động)
+npx fare-skill-pack uninstall [target]    # Gỡ
+npx fare-skill-pack register-mcp          # Chỉ in lệnh register MCP
+npx fare-skill-pack help                  # Trợ giúp
+npx fare-skill-pack version               # Phiên bản
 ```
 
 `target` mặc định là thư mục hiện tại (`cwd`). Pass đường dẫn khác nếu cần cài cho workspace khác.
@@ -91,7 +91,7 @@ npx @fare/skill-pack version               # Phiên bản
 ## Cập nhật
 
 ```bash
-npx @fare/skill-pack update
+npx fare-skill-pack update
 ```
 
 Sẽ backup `.agent/` hiện tại thành `.agent.bak.YYYY-MM-DDTHH-MM-SS/` rồi overwrite với template mới. Nếu bạn đã edit `.agent/` riêng, diff với backup sau update.

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// fare-skill — CLI cho @fare/skill-pack
+// fare-skill — CLI cho fare-skill-pack
 // Subcommands: init | update | uninstall | register-mcp | help
 //
 // Zero deps (chi dung Node stdlib).
@@ -69,7 +69,7 @@ function bail(msg, code = 1) {
 // ============================================================
 
 async function cmdInit(args) {
-    log(bold(`\n@fare/skill-pack v${VERSION} — init\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — init\n`));
 
     // 1. Target dir
     const cwd = process.cwd();
@@ -90,7 +90,7 @@ async function cmdInit(args) {
         warn(`${dstAgent} đã tồn tại.`);
         const yes = await confirm('Ghi đè (mất dữ liệu hiện có)?');
         if (!yes) {
-            info('Hủy. Để cập nhật → dùng `npx @fare/skill-pack update`.');
+            info('Hủy. Để cập nhật → dùng `npx fare-skill-pack update`.');
             return;
         }
         await rm(dstAgent, { recursive: true, force: true });
@@ -132,14 +132,14 @@ async function cmdInit(args) {
 }
 
 async function cmdUpdate(args) {
-    log(bold(`\n@fare/skill-pack v${VERSION} — update\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — update\n`));
 
     const cwd = process.cwd();
     const target = resolve(cwd, args[0] || cwd);
     const dstAgent = join(target, '.agent');
 
     if (!existsSync(dstAgent)) {
-        bail(`Không tìm thấy .agent/ ở ${target}\nDùng \`npx @fare/skill-pack init\` để cài lần đầu.`);
+        bail(`Không tìm thấy .agent/ ở ${target}\nDùng \`npx fare-skill-pack init\` để cài lần đầu.`);
     }
     if (!existsSync(TEMPLATE_AGENT)) {
         bail(`Template không tồn tại trong package: ${TEMPLATE_AGENT}`);
@@ -169,7 +169,7 @@ async function cmdUpdate(args) {
 }
 
 async function cmdUninstall(args) {
-    log(bold(`\n@fare/skill-pack v${VERSION} — uninstall\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — uninstall\n`));
 
     const cwd = process.cwd();
     const target = resolve(cwd, args[0] || cwd);
@@ -194,7 +194,7 @@ async function cmdUninstall(args) {
 }
 
 async function cmdRegisterMcp() {
-    log(bold(`\n@fare/skill-pack v${VERSION} — register-mcp\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — register-mcp\n`));
     info('Tạo lệnh đăng ký FARE MCP server với Claude Code. Lệnh sẽ được IN, KHÔNG tự exec.');
     log('');
     const endpoint = await prompt('FARE MCP endpoint', 'http://localhost:3002/mcp');
@@ -215,11 +215,11 @@ async function cmdRegisterMcp() {
 
 function cmdHelp() {
     log(`
-${bold('@fare/skill-pack')} v${VERSION}
+${bold('fare-skill-pack')} v${VERSION}
 Antigravity / Claude Code skill pack for FARE.
 
 ${bold('Cách dùng:')}
-  npx @fare/skill-pack <command> [args]
+  npx fare-skill-pack <command> [args]
 
 ${bold('Lệnh:')}
   ${C.cyan}init${C.reset} [target]       Cài .agent/ vào workspace (default: cwd) + in lệnh register MCP.
@@ -231,13 +231,13 @@ ${bold('Lệnh:')}
 
 ${bold('Ví dụ:')}
   ${dim('# Lần đầu cài cho workspace hiện tại')}
-  npx @fare/skill-pack init
+  npx fare-skill-pack init
 
   ${dim('# Cài cho workspace khác')}
-  npx @fare/skill-pack init ~/projects/my-app
+  npx fare-skill-pack init ~/projects/my-app
 
   ${dim('# Cập nhật khi có version mới')}
-  npx @fare/skill-pack update
+  npx fare-skill-pack update
 
 ${bold('Yêu cầu:')}
   - Node >= 18

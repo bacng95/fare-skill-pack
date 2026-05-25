@@ -3,6 +3,13 @@ template/
 *.tgz
 .DS_Store
 *.log
-docs/outputs/
+
+# BA draft outputs (root level only — .agent/docs/outputs/ giữ làm template empty dir)
+/docs/outputs/
+
+# Local secrets
 .env
 .env.local
+
+# Python helper scripts trong /docs/outputs/ (legacy)
+/docs/**/*.py
