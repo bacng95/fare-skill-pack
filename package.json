@@ -33,13 +33,13 @@
     "dev",
     "agent"
   ],
-  "homepage": "https://github.com/fare/skill-pack#readme",
+  "homepage": "https://github.com/bacng95/fare-skill-pack#readme",
   "bugs": {
-    "url": "https://github.com/fare/skill-pack/issues"
+    "url": "https://github.com/bacng95/fare-skill-pack/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fare/skill-pack.git"
+    "url": "git+https://github.com/bacng95/fare-skill-pack.git"
   },
   "publishConfig": {
     "access": "public"
