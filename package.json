@@ -1,0 +1,47 @@
+{
+  "name": "@fare/skill-pack",
+  "version": "1.0.0",
+  "description": "Antigravity / Claude Code skill pack for FARE — 6 agents (BA · PM · QA · Dev · technical-writer · spec-reviewer), 22 skills, 16 workflows operating FARE via MCP.",
+  "type": "module",
+  "bin": {
+    "fare-skill": "bin/fare-skill.mjs"
+  },
+  "files": [
+    "bin",
+    "template",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "prepack": "node bin/prepack.mjs",
+    "test:pack": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "author": "FARE team",
+  "keywords": [
+    "fare",
+    "antigravity",
+    "claude-code",
+    "mcp",
+    "skill-pack",
+    "ba",
+    "pm",
+    "qa",
+    "dev",
+    "agent"
+  ],
+  "homepage": "https://github.com/fare/skill-pack#readme",
+  "bugs": {
+    "url": "https://github.com/fare/skill-pack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fare/skill-pack.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

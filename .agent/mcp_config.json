@@ -1,0 +1,15 @@
+{
+  // MẪU THAM CHIẾU — Antigravity đọc MCP config TỪ ~/.gemini/antigravity/mcp_config.json (global),
+  // KHÔNG từ file này. Copy khối "fare" sang file global đó và điền token thật.
+  // KHÔNG commit token thật vào repo.
+  "mcpServers": {
+    "fare": {
+      "serverUrl": "https://fare.kola.vn/mcp",
+      "headers": {
+        "Authorization": "Bearer <FARE_MCP_TOKEN>",
+        "Accept": "application/json, text/event-stream"
+      },
+      "disabled": false
+    }
+  }
+}

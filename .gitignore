@@ -1,0 +1,8 @@
+node_modules/
+template/
+*.tgz
+.DS_Store
+*.log
+docs/outputs/
+.env
+.env.local
