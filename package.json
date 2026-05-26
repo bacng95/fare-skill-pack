@@ -4,6 +4,7 @@
   "description": "Antigravity / Claude Code skill pack for FARE — 6 agents (BA · PM · QA · Dev · technical-writer · spec-reviewer), 22 skills, 16 workflows operating FARE via MCP.",
   "type": "module",
   "bin": {
+    "fare-skill-pack": "bin/fare-skill.mjs",
     "fare-skill": "bin/fare-skill.mjs"
   },
   "files": [

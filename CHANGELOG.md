@@ -10,6 +10,17 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
 
 ---
 
+## [1.0.1] — 2026-05-26
+
+### Fixed
+- `npx fare-skill-pack init` thất bại với `fare-skill: not found` vì bin name khác package name. Thêm bin alias `fare-skill-pack` (trùng tên package) bên cạnh `fare-skill` cũ. Cả 2 lệnh đều work, không break user đã quen `fare-skill`.
+
+### Notes
+- Trên v1.0.0, workaround tạm: `npx -p fare-skill-pack fare-skill init`.
+- Trên v1.0.1+: `npx fare-skill-pack init` work native.
+
+---
+
 ## [1.0.0] — 2026-05-25
 
 Initial release — bộ skill Antigravity / Claude Code đầu tiên vận hành FARE qua MCP. Phủ trọn vòng đời `requirements → design → dev → testing` với 4 vai chính + 2 vai phụ trợ.
@@ -84,5 +95,6 @@ npx github:bacng95/fare-skill-pack#v1.0.0 init
 - Không phụ thuộc external npm package nào ngoài Node stdlib.
 - Tương thích Antigravity và Claude Code.
 
-[Unreleased]: https://github.com/bacng95/fare-skill-pack/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/bacng95/fare-skill-pack/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.1
 [1.0.0]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.0
