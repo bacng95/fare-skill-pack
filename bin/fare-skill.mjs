@@ -103,32 +103,11 @@ async function cmdInit(args) {
     await cp(TEMPLATE_AGENT, dstAgent, { recursive: true });
     ok(`Đã copy bộ skill → ${dstAgent}`);
 
-    // 4. MCP register info — KHÔNG tự exec
     log('');
-    info('Bước tiếp theo — đăng ký MCP server FARE với Claude Code:');
-    log('');
-    const endpoint = await prompt('  FARE MCP endpoint', 'http://localhost:3002/mcp');
-    const apiKey = await prompt('  FARE API key (sẽ KHÔNG được tự exec — chỉ in lệnh)');
-    const scope = await prompt('  Scope (local|user|project)', 'user');
-
-    log('');
-    log(bold('Chạy lệnh sau để register MCP:'));
-    log('');
-    if (apiKey) {
-        log(`  ${C.cyan}claude mcp add --transport http --scope ${scope} fare ${endpoint} \\${C.reset}`);
-        log(`  ${C.cyan}    --header "Authorization: Bearer ${apiKey}"${C.reset}`);
-    } else {
-        warn('Không nhập API key. Lệnh template:');
-        log(`  ${C.cyan}claude mcp add --transport http --scope ${scope} fare ${endpoint} \\${C.reset}`);
-        log(`  ${C.cyan}    --header "Authorization: Bearer YOUR_KEY"${C.reset}`);
-    }
-    log('');
-    log(bold('Sau đó:'));
-    log('  1. Restart Claude Code (hoặc gõ /mcp reconnect trong phiên hiện tại).');
-    log('  2. Đọc hướng dẫn dùng: ' + dim(`${dstAgent}/USAGE.md`));
-    log('  3. Thử ngay: ' + dim('/fare-ba [project-code] [tên tính năng]'));
-    log('');
-    ok('Cài đặt hoàn tất.');
+    log(bold('Bước tiếp theo:'));
+    log('  1. Đăng ký FARE MCP server (nếu chưa): ' + dim('npx fare-skill-pack register-mcp'));
+    log('  2. Restart Claude Code hoặc gõ ' + dim('/mcp reconnect') + ' để load tool.');
+    log('  3. Đọc hướng dẫn: ' + dim(`${dstAgent}/USAGE.md`));
 }
 
 async function cmdUpdate(args) {

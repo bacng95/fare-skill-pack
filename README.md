@@ -12,7 +12,7 @@ npx fare-skill-pack init
 npx github:bacng95/fare-skill-pack init
 ```
 
-CLI sao chép thư mục `.agent/` vào workspace, prompt MCP endpoint + API key, rồi in lệnh `claude mcp add` để chạy thủ công. Secret không được truyền vào subprocess.
+CLI sao chép thư mục `.agent/` vào workspace. Đăng ký MCP server FARE là bước riêng — chạy `npx fare-skill-pack register-mcp` để xem lệnh `claude mcp add` cần thực thi, hoặc tự cấu hình theo tài liệu của Claude Code.
 
 ## Yêu cầu
 
@@ -39,7 +39,7 @@ fare-skill-pack <command> [target]
 
 | Command | Mô tả |
 |---|---|
-| `init` | Sao chép `.agent/` vào target (mặc định `cwd`); in lệnh đăng ký MCP. |
+| `init` | Sao chép `.agent/` vào target (mặc định `cwd`). |
 | `update` | Backup `.agent/` hiện tại sang `.agent.bak.<timestamp>/`, ghi đè với version mới. |
 | `uninstall` | Xóa `.agent/` (có confirm). |
 | `register-mcp` | In lệnh `claude mcp add` (không sao chép file). |

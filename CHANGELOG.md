@@ -13,11 +13,14 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
 ## [1.0.1] — 2026-05-26
 
 ### Fixed
-- `npx fare-skill-pack init` thất bại với `fare-skill: not found` vì bin name khác package name. Thêm bin alias `fare-skill-pack` (trùng tên package) bên cạnh `fare-skill` cũ. Cả 2 lệnh đều work, không break user đã quen `fare-skill`.
+- `npx fare-skill-pack init` thất bại với `fare-skill: not found` vì bin name khác package name. Thêm bin alias `fare-skill-pack` (trùng tên package) bên cạnh `fare-skill` cũ. Cả hai lệnh đều khả dụng.
+
+### Changed
+- `init` không còn prompt MCP endpoint / API key / scope. Trách nhiệm đăng ký MCP tách sang `register-mcp` command riêng. `init` giờ chỉ sao chép `.agent/` vào target.
 
 ### Notes
-- Trên v1.0.0, workaround tạm: `npx -p fare-skill-pack fare-skill init`.
-- Trên v1.0.1+: `npx fare-skill-pack init` work native.
+- Trên v1.0.0, workaround cho bin alias: `npx -p fare-skill-pack fare-skill init`.
+- Trên v1.0.1+, `npx fare-skill-pack init` chạy native.
 
 ---
 
