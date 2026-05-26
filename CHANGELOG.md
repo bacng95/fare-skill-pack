@@ -10,13 +10,18 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
 
 ---
 
+## [1.0.2] — 2026-05-26
+
+### Changed
+- `init` không còn prompt MCP endpoint / API key / scope. Trách nhiệm đăng ký MCP tách sang `register-mcp` command riêng. `init` giờ chỉ sao chép `.agent/` vào target và in next-steps hint.
+- README rewrite theo văn phong factual, lược bỏ phrasing mang tính marketing / tự sự.
+
+---
+
 ## [1.0.1] — 2026-05-26
 
 ### Fixed
 - `npx fare-skill-pack init` thất bại với `fare-skill: not found` vì bin name khác package name. Thêm bin alias `fare-skill-pack` (trùng tên package) bên cạnh `fare-skill` cũ. Cả hai lệnh đều khả dụng.
-
-### Changed
-- `init` không còn prompt MCP endpoint / API key / scope. Trách nhiệm đăng ký MCP tách sang `register-mcp` command riêng. `init` giờ chỉ sao chép `.agent/` vào target.
 
 ### Notes
 - Trên v1.0.0, workaround cho bin alias: `npx -p fare-skill-pack fare-skill init`.
@@ -98,6 +103,7 @@ npx github:bacng95/fare-skill-pack#v1.0.0 init
 - Không phụ thuộc external npm package nào ngoài Node stdlib.
 - Tương thích Antigravity và Claude Code.
 
-[Unreleased]: https://github.com/bacng95/fare-skill-pack/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/bacng95/fare-skill-pack/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.2
 [1.0.1]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.1
 [1.0.0]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.0
