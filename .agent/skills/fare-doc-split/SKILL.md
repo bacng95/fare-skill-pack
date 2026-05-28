@@ -63,12 +63,16 @@ KHÔNG đọc rồi giữ cả tài liệu trong đầu — tài liệu người
 Phần dùng chung (vai trò, quy tắc validate SĐT / email / ngày, danh mục drop-down) → tách thành 1 file riêng.
 
 ### Lỗi nguồn — sổ ⚠️ riêng, KHÔNG sửa thầm (§7)
-Doc thực tế thường nhiều lỗi: typo ("Đang học động", "KCác"), copy-paste sai (Title trong Overview ≠ heading; description mục này dán nhầm mục khác; "trợ giảng" lẫn trong doc về "lớp"), số mục lạ. Markup mang **ý nghĩa nội dung** (KHÔNG phải form):
+Doc thực tế thường nhiều lỗi: typo ("Đang học động", "KCác"), copy-paste sai (Title trong Overview ≠ heading; description mục này dán nhầm mục khác; "trợ giảng" lẫn trong doc về "lớp"; Post condition mục này nói về mục khác), số mục lạ. Markup mang **ý nghĩa nội dung** (KHÔNG phải form):
 - `<s>...</s>` (gạch ngang) = nội dung bị BỎ. Vd "Khối <s>(Bắt buộc)</s>" → Khối KHÔNG còn bắt buộc; "<s>Tên riêng (Bắt buộc)</s>" + con của nó gạch hết → field bị bỏ. Khi tách: GIỮ NGUYÊN dấu gạch (truyền tải đúng "đã bỏ"). KHÔNG tự xóa, KHÔNG tự coi như còn hiệu lực.
 - `<mark>...</mark>` (highlight) = điểm người soạn đang nhấn / chưa chốt. Giữ nguyên, ghi nhận là "điểm cần xác nhận" nếu nhiều.
 - `comment-highlight` (`data-comment-id`) = đoạn có thảo luận chưa chốt mà agent không đọc được nội dung comment → đánh dấu `⚠️ điểm mở`.
 
 Mỗi lỗi nguồn / điểm `<s>`/`<mark>`/comment → ghi vào **sổ ⚠️** kèm vị trí (mục nào), báo User ở Bước 3. TUYỆT ĐỐI không "sửa cho đẹp" hay "phát hiện lỗi" không có thật.
+
+### Ảnh nhúng & bậc thụt lề đa kiểu (HTML từ Word/editor rất bẩn)
+- **Ảnh nhúng** `<img src="fare://files/{key}" alt="...">`: ảnh thường là minh họa UI (toggle, nút, layout). **Nội dung spec nằm ở TEXT quanh ảnh**, KHÔNG ở ảnh. `alt` / `imageSummaries` là **caption do AI sinh** — chứa noise ("LightRAG Schema", "Nodes/Edges", mô tả pixel) → **KHÔNG chép alt làm nội dung yêu cầu**. Khi tách: GIỮ ref `fare://files/{key}` (để normalize render link), bỏ qua nội dung caption AI. Đọc `imageSummaries` chỉ để TỰ HIỂU ảnh là gì, không đưa vào nháp.
+- **Bậc thụt lề mã hóa nhiều kiểu trong cùng doc** — KHÔNG chỉ `<ul><li>`. Thực tế gặp đồng thời: `<p data-indent="N" style="padding-left:Npx">`, `<ul><li>`, marker chuỗi `⟨INDENT:pl=113⟩` chèn đầu text, và dấu `+`/`-` làm sub-bullet. Tất cả đều là **tín hiệu BẬC**, không phải nội dung. Khi tách: giữ raw (chưa cần dựng cây) — `fare-doc-normalize` dựng bullet từ các tín hiệu này. Marker `⟨INDENT:pl=NNN⟩` là **chuỗi điều khiển của editor/converter** — KHÔNG phải chữ người dùng gõ; ghi nhận để normalize bỏ.
 
 ## Bước 3 — Báo cáo & DỪNG chờ duyệt
 Xong toàn bộ nháp local → báo User gọn: số file, đường dẫn `docs/outputs/...`, và sổ `⚠️` lỗi nguồn / điểm suy luận (nếu có).

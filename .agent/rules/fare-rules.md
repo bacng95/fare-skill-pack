@@ -119,8 +119,10 @@ Agent thao tác với hệ thống FARE **chỉ** qua MCP tool / resource của 
 - Đọc file cấu hình, `.env`, secret, connection string, khóa API.
 - Kết nối trực tiếp tới database; chạy SQL hay script tay.
 - Gọi API nội bộ, dò cổng, hay bất kỳ cách "đi đường vòng" nào khác để lấy / đổi dữ liệu FARE.
-- Tự viết script / chương trình (Python, shell…) để gọi MCP server, hoặc để fetch / parse / "xử lý hàng loạt" dữ liệu FARE. **MCP tool là giao diện DUY NHẤT** — đọc tài liệu = tool `read_document` / resource, tạo tài liệu = `create_document`… Công việc = lời gọi MCP tool + suy luận của chính agent, KHÔNG phải một pipeline script tự dựng.
+- Tự viết script / chương trình (Python, shell…) **để gọi MCP server / FARE API / DB** hay đi đường vòng "lấy bằng được" dữ liệu FARE. **MCP tool là giao diện DUY NHẤT để ĐỌC/GHI FARE** — đọc = `read_document` / resource, ghi = `create_document`… KHÔNG phải pipeline script tự gọi API.
 - Lấy file local / file scratch / kết quả của một phiên chạy TRƯỚC làm "nguồn sự thật". Tài liệu sống trên FARE thì nguồn LUÔN là FARE — đọc **tươi** qua `read_document` (ghim đúng `version`) mỗi lần làm việc. File local có thể đã hỏng hoặc lệch phiên bản.
+
+> Script local thuần **biến đổi text đã đọc qua MCP** (không chạm MCP/API/DB/network) KHÔNG bị §8 cấm — đó chỉ là xử lý cú pháp trên dữ liệu agent đã có. Chi tiết & điều kiện: nằm ở skill dùng nó (vd `fare-doc-normalize`).
 
 **Provenance — file local phải tự khai xuất xứ:** mọi file `docs/outputs/` agent sinh ra từ một tài liệu FARE phải mở đầu bằng một dòng ghi rõ: nguồn (`fare://documents/{id}`), `version`, thời điểm tạo. Để bất kỳ ai (người / agent) cũng biết nháp dựa trên bản FARE nào, và kiểm được FARE đã đổi chưa.
 

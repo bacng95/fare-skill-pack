@@ -67,3 +67,25 @@ Mục nào nguồn không có → BỎ (không bịa cho đủ).
 - **`comment-highlight` (`data-comment-id`)** = có thảo luận chưa chốt mà agent không đọc được → giữ text, thêm `⚠️ điểm mở (có comment chưa chốt)`.
 
 Tóm: form (bảng HTML, `<strong>`, `<mark>` màu nền, data-id) → làm sạch thoải mái. Ngữ nghĩa (`<s>` = đã bỏ, comment = chưa chốt) → BẢO TOÀN + ⚠️.
+
+## Dựng bậc bullet từ indent ĐA KIỂU
+HTML từ Word/editor mã hóa bậc thụt lề **nhiều cách lẫn lộn trong cùng tài liệu** — KHÔNG chỉ `<ul><li>`. Phải nhận tất cả như tín hiệu BẬC và gom về bullet markdown chuẩn theo độ sâu:
+
+| Tín hiệu nguồn | Nghĩa | Quy về |
+|---|---|---|
+| `<ul><li>` lồng | bậc theo độ lồng | bullet `-` theo độ sâu |
+| `<p data-indent="N" style="padding-left:Npx">` | bậc = N (hoặc px/32) | bullet `-` ở bậc N |
+| `⟨INDENT:pl=NNN⟩` ở đầu text | **marker điều khiển** của editor — pl=px | BỎ marker; bậc = round(NNN/32) |
+| Dòng mở đầu bằng `+` hoặc `-` (trong nội dung) | sub-bullet người soạn tự gõ | bullet con 1 bậc sâu hơn dòng cha |
+| `<ul><li><p></p></li></ul>` rỗng | rác từ Word | BỎ hẳn |
+
+- Quy đổi px → bậc: ~32px = 1 bậc (padding-left:32→bậc1, 64→bậc2, 128→bậc4). Không cần chính xác tuyệt đối — giữ ĐÚNG THỨ TỰ cha/con tương đối là đủ.
+- Marker `⟨INDENT:pl=NNN⟩`, `data-id`, `style`, `data-indent`, `colspan` → tất cả là FORM/control → bỏ sạch trong output.
+- KHÔNG đổi thứ tự, KHÔNG gộp/tách dòng — chỉ chuẩn hóa cách biểu diễn bậc. Mỗi dòng truy ngược 1:1 về nguồn.
+
+## Ảnh nhúng
+`<img src="fare://files/{key}" alt="<caption AI dài + noise>">`:
+- Ảnh là minh họa UI; **nội dung yêu cầu nằm ở text quanh ảnh** (giữ nguyên text đó).
+- Chuyển thành: `![Ảnh minh hoạ](fare://files/{key})` HOẶC `[Ảnh: <mô tả ngắn 1 dòng nếu cần>](fare://files/{key})`. GIỮ ref `fare://files/{key}`.
+- **BỎ alt caption AI** ("LightRAG Schema", "Nodes/Edges", mô tả pixel chi tiết) — đó là noise, KHÔNG phải đặc tả. KHÔNG chép vào nội dung.
+- Ảnh nằm giữa một bước/field → đặt ref ảnh ngay tại vị trí đó, không tách rời khỏi ngữ cảnh.

@@ -23,8 +23,14 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
 - `fare-mcp-integration`: note về **strict param validation** — param sai tên bị reject (`Unrecognized key`) thay vì bỏ qua âm thầm; gặp lỗi thì đọc lại mô tả tool, không tự đoán tên param.
 
 ### Fixed
-- `fare-doc-split`: sửa mô hình đọc — `read_document` phân trang theo KÝ TỰ (cắt ngang section/table), KHÔNG theo section. Bước 2 nay hướng dẫn đọc tuần tự + ghép theo ranh giới heading (đóng section chỉ khi gặp heading kế tiếp) → chống mất đuôi / lẫn đầu section. Bổ sung: nhãn "- DONE" (bỏ ở tên file, giữ ở nội dung), cross-ref đa dạng ("(Mục X.Y)", số lạ), xử lý `<s>`/`<mark>`/comment-highlight + sổ ⚠️ lỗi nguồn.
-- `fare-doc-normalize`: `<s>` (gạch = nội dung đã bỏ) phải giữ (`~~...~~`) + ⚠️, KHÔNG xóa/coi như còn hiệu lực; `<mark>`/comment-highlight bảo toàn ngữ nghĩa. Phân định rõ form (làm sạch) vs ngữ nghĩa (bảo toàn). Verified thực tế trên doc "Quản lý lớp" (7 trang, HTML table từ Word).
+- `fare-doc-split`: sửa mô hình đọc — `read_document` phân trang theo KÝ TỰ (cắt ngang section/table), KHÔNG theo section. Bước 2 nay hướng dẫn đọc tuần tự + ghép theo ranh giới heading (đóng section chỉ khi gặp heading kế tiếp) → chống mất đuôi / lẫn đầu section. Bổ sung: nhãn "- DONE" (bỏ ở tên file, giữ ở nội dung), cross-ref đa dạng ("(Mục X.Y)", số lạ), xử lý `<s>`/`<mark>`/comment-highlight + sổ ⚠️ lỗi nguồn; ảnh nhúng (giữ ref `fare://files`, bỏ alt AI noise); indent đa kiểu + marker `⟨INDENT:pl=N⟩`.
+- `fare-doc-normalize`: `<s>` (gạch = nội dung đã bỏ) phải giữ (`~~...~~`) + ⚠️, KHÔNG xóa/coi như còn hiệu lực; `<mark>`/comment-highlight bảo toàn ngữ nghĩa. Phân định rõ form (làm sạch) vs ngữ nghĩa (bảo toàn).
+
+### Added (doc-split/normalize)
+- **Script `scripts/html_to_md.py`** (Python stdlib, zero-dep) cho `fare-doc-normalize` — biến đổi cú pháp deterministic: table→heading+key-value, bullet từ indent đa kiểu (`<ul><li>`/`data-indent`/`padding-left`/`⟨INDENT:pl=N⟩`/`+`), `<img fare://files>`→markdown (bỏ alt AI), `<s>`→`~~..~~`, `<mark>`→bỏ thẻ, comment-highlight→⚠️, heading function→`#`. Script **pure local transform** — không gọi MCP/DB. Skill nay phân vai: script lo cú pháp lặp-lại, agent lo ngữ nghĩa (ranh giới section, cross-ref, sổ ⚠️, đặt tên).
+- `fare-rules.md §8`: làm gọn về nguyên tắc (MCP là kênh DUY NHẤT đọc/ghi FARE) + 1 dòng carve-out cho script biến đổi text local; chi tiết vận hành nằm ở skill, không nhồi vào rule chung.
+
+> Verified thực tế trên doc "Quản lý lớp" (id 163, 7 trang) + "Quản lý trường/doanh nghiệp" (id 162, 19 trang, có ảnh nhúng + indent đa kiểu + marker) — HTML table export từ Word.
 
 ### Notes
 - Yêu cầu FARE backend có: migration `tasks.bug_origin` + MCP tool contract expose `bug_origin` / `linked_task_id` (CREATE/UPDATE/LIST task) + strict tool input validation. Skill pack v1.1.0 đi kèm backend tương thích.
