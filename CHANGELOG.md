@@ -22,6 +22,10 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
   - `fare-backlog-grooming`: bucket mới — task chặn bởi bug INTRINSIC, bug INTRINSIC mồ côi, EXTRINSIC tồn đọng.
 - `fare-mcp-integration`: note về **strict param validation** — param sai tên bị reject (`Unrecognized key`) thay vì bỏ qua âm thầm; gặp lỗi thì đọc lại mô tả tool, không tự đoán tên param.
 
+### Fixed
+- `fare-doc-split`: sửa mô hình đọc — `read_document` phân trang theo KÝ TỰ (cắt ngang section/table), KHÔNG theo section. Bước 2 nay hướng dẫn đọc tuần tự + ghép theo ranh giới heading (đóng section chỉ khi gặp heading kế tiếp) → chống mất đuôi / lẫn đầu section. Bổ sung: nhãn "- DONE" (bỏ ở tên file, giữ ở nội dung), cross-ref đa dạng ("(Mục X.Y)", số lạ), xử lý `<s>`/`<mark>`/comment-highlight + sổ ⚠️ lỗi nguồn.
+- `fare-doc-normalize`: `<s>` (gạch = nội dung đã bỏ) phải giữ (`~~...~~`) + ⚠️, KHÔNG xóa/coi như còn hiệu lực; `<mark>`/comment-highlight bảo toàn ngữ nghĩa. Phân định rõ form (làm sạch) vs ngữ nghĩa (bảo toàn). Verified thực tế trên doc "Quản lý lớp" (7 trang, HTML table từ Word).
+
 ### Notes
 - Yêu cầu FARE backend có: migration `tasks.bug_origin` + MCP tool contract expose `bug_origin` / `linked_task_id` (CREATE/UPDATE/LIST task) + strict tool input validation. Skill pack v1.1.0 đi kèm backend tương thích.
 

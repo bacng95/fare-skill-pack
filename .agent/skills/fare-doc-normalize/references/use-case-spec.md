@@ -56,3 +56,14 @@ Mục nào nguồn không có → BỎ (không bịa cho đủ).
 - Nhánh điều kiện trong một bước → bullet `**Nếu …:**`.
 - `(Bắt buộc)` chỉ thêm khi nguồn ghi rõ — KHÔNG tự gán.
 - Tham chiếu chéo: `{số} {tên đầy đủ}`, không để số trần.
+- Nhãn trạng thái thủ công trong heading nguồn ("- DONE", "– WIP"): BỎ khỏi heading khi normalize (trạng thái nằm trên FARE, không trong nội dung) — nhưng đây là quyết định FORM; nếu không chắc, giữ + `⚠️`.
+
+## Markup mang ý nghĩa NỘI DUNG — KHÔNG được tự xử như form
+`<s>`, `<mark>`, comment-highlight KHÔNG phải markup trang trí — chúng mang ngữ nghĩa. normalize chỉ đổi FORM, nên:
+- **`<s>...</s>` (gạch ngang)** = nội dung người soạn đã BỎ. Vd `Khối <s>(Bắt buộc)</s>` = khối không còn bắt buộc; `<s>Tên riêng (Bắt buộc)</s>` + con gạch hết = field bị loại.
+  - Markdown: giữ bằng `~~...~~` (strikethrough) HOẶC ghi rõ `(đã bỏ)` — chọn 1, nhất quán. KHÔNG xóa hẳn (mất dấu vết quyết định), KHÔNG coi như còn hiệu lực (vd KHÔNG ghi "Khối (Bắt buộc)").
+  - Nếu cả field bị gạch → giữ field dưới dạng `~~Tên riêng (Bắt buộc)~~` + `⚠️ field này nguồn đã gạch bỏ — xác nhận có loại không`.
+- **`<mark>...</mark>` (highlight)** = điểm người soạn nhấn / chưa chốt. Bỏ thẻ `<mark>` (đó là màu nền — form) NHƯNG nếu nhiều mark cụm lại ở 1 field → ghi `⚠️ điểm nhấn/chưa chốt` 1 lần cho cụm.
+- **`comment-highlight` (`data-comment-id`)** = có thảo luận chưa chốt mà agent không đọc được → giữ text, thêm `⚠️ điểm mở (có comment chưa chốt)`.
+
+Tóm: form (bảng HTML, `<strong>`, `<mark>` màu nền, data-id) → làm sạch thoải mái. Ngữ nghĩa (`<s>` = đã bỏ, comment = chưa chốt) → BẢO TOÀN + ⚠️.
