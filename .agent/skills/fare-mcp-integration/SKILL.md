@@ -36,6 +36,24 @@ FARE có 4 khái niệm gom việc lại với nhau, dễ nhầm. Mỗi cái có
 
 **Đóng epic = quyết định người thật** — agent đề xuất `status="done"` chỉ khi MỌI task gắn epic đã `meta_status="DONE"` (xem `fare-epic-management` Bước close).
 
+## Bug INTRINSIC ≠ EXTRINSIC (bug nội sinh vs ngoại lai)
+
+Bug (`type=BUG`) trên FARE có `bug_origin` quyết định nó có chặn task khác hay không:
+
+| `bug_origin` | Nghĩa | `linked_task_id` | Tác động |
+|---|---|---|---|
+| **INTRINSIC** (nội sinh) | Bug phát sinh TRONG quá trình làm 1 task cha — TC verify failed, tester báo từ task drawer | **BẮT BUỘC** trỏ về task cha | **Chặn task cha chuyển DONE** đến khi bug đóng (`meta_status=DONE`) |
+| **EXTRINSIC** (ngoại lai) | Bug độc lập — production incident, QA regression, user report | Không cần | Không chặn task nào; sống độc lập |
+
+**Tạo bug qua MCP:**
+- `create_tasks(type="BUG", bug_origin="INTRINSIC", linked_task_id=<task cha>, ...)` — INTRINSIC phải có `linked_task_id` (thiếu → lỗi validation).
+- `create_tasks(type="BUG", bug_origin="EXTRINSIC", ...)` — hoặc bỏ `bug_origin` + không `linked_task_id` → backend tự infer EXTRINSIC.
+- Backend infer mặc định: có `linked_task_id` → INTRINSIC; không → EXTRINSIC. Nên **truyền `bug_origin` tường minh** để chắc chắn.
+
+**DONE Gate (lỗi `422 TASK_DONE_BLOCKED`):** `update_task(meta_status="DONE")` cho 1 task bị chặn khi task đó còn bug INTRINSIC chưa đóng HOẶC TC link `failed`. Error payload có `open_intrinsic_bugs[]` + `failed_test_cases[]`. Đọc payload, KHÔNG retry mù — đóng bug / re-verify TC trước (xem `rules/fare-rules.md` §6).
+
+**Filter bug nội sinh của 1 task:** `list_tasks(projectCode, type="BUG", bug_origin="INTRINSIC", linked_task_id=<id>)`.
+
 ## Bẫy không hiển nhiên
 - **Optional param — KHÔNG truyền `null`.** Field không đổi → bỏ hẳn khỏi payload. Truyền `null` cho field số (`folder_id`, `module_id`...) → lỗi `-32602 Input validation error`.
 - **Folder & vị trí tài liệu:**

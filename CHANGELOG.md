@@ -10,6 +10,22 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
 
 ---
 
+## [1.1.0] — 2026-05-28
+
+### Added
+- Hỗ trợ khái niệm **bug INTRINSIC (nội sinh) vs EXTRINSIC (ngoại lai)** của FARE:
+  - `fare-mcp-integration`: mục mới giải thích `bug_origin`, `linked_task_id` bắt buộc cho INTRINSIC, và lỗi `422 TASK_DONE_BLOCKED`.
+  - `fare-rules.md` §6: DONE Gate cứng — task không thể chuyển DONE khi còn bug INTRINSIC chưa đóng hoặc TC `failed` chưa re-verify (backend enforce).
+  - `fare-bug-reporting`: bước xác định `bug_origin`; TC fail → mặc định INTRINSIC + `linked_task_id` task gốc; bug độc lập → EXTRINSIC.
+  - `fare-test-execution`: TC fail tạo bug INTRINSIC chặn task gốc; đối chiếu bug INTRINSIC open khi đề xuất task TEST → DONE.
+  - `fare-self-verify`: Dev check bug INTRINSIC open trước khi handoff/DONE.
+  - `fare-backlog-grooming`: bucket mới — task chặn bởi bug INTRINSIC, bug INTRINSIC mồ côi, EXTRINSIC tồn đọng.
+
+### Notes
+- Yêu cầu FARE backend có migration `tasks.bug_origin` + MCP tool contract expose `bug_origin` / `linked_task_id` (CREATE/UPDATE/LIST task). Skill pack v1.1.0 đi kèm backend tương thích.
+
+---
+
 ## [1.0.2] — 2026-05-26
 
 ### Changed
@@ -103,7 +119,8 @@ npx github:bacng95/fare-skill-pack#v1.0.0 init
 - Không phụ thuộc external npm package nào ngoài Node stdlib.
 - Tương thích Antigravity và Claude Code.
 
-[Unreleased]: https://github.com/bacng95/fare-skill-pack/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/bacng95/fare-skill-pack/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.1.0
 [1.0.2]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.2
 [1.0.1]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.1
 [1.0.0]: https://github.com/bacng95/fare-skill-pack/releases/tag/v1.0.0

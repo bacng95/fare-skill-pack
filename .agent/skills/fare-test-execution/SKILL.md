@@ -89,21 +89,25 @@ Round verify — Doc test_case 245 — staging:
 Sẽ gọi 3 update_test_case. OK?
 ```
 
-User chốt → thực thi tuần tự. Mỗi fail dừng lại hỏi: "tạo BUG task để track không?" (xem `fare-bug-reporting`).
+User chốt → thực thi tuần tự. Mỗi TC fail dừng lại hỏi: "tạo BUG **nội sinh (INTRINSIC)** linked task gốc để track không?" (xem `fare-bug-reporting`).
+
+**Lưu ý quan trọng — TC fail tạo bug INTRINSIC:** khi TC `failed` và User đồng ý tạo BUG, mặc định `bug_origin="INTRINSIC"` + `linked_task_id` = task TEST gốc (hoặc feature task chứa TC). Bug INTRINSIC sẽ **chặn task gốc chuyển DONE** đến khi đóng — đúng semantic: feature chưa đạt AC thì task chưa xong. KHÔNG dùng EXTRINSIC cho TC fail.
+
+**Lưu ý — TC `failed` tự nó đã chặn DONE:** ngay cả khi chưa tạo BUG, một TC link với task ở `verify_status="failed"` cũng khiến backend chặn task đó chuyển DONE (rule §6). Re-verify TC → `passed` mới gỡ chặn.
 
 ## Bước 4 — Đối chiếu với task `type=TEST` của PM
 
-Task `type=TEST` chỉ vào `DONE` khi **mọi TC linked có verify_history.passed** (rule §6 cứng).
+Task `type=TEST` chỉ vào `DONE` khi **mọi TC linked có verify_history.passed** (rule §6 cứng). Backend cũng chặn DONE nếu còn TC `failed` hoặc bug INTRINSIC chưa đóng (lỗi `422 TASK_DONE_BLOCKED`).
 
 Sau round verify:
 1. `list_tasks(projectCode, type="TEST")` lọc task có `test_case_ids` chứa TC vừa verify.
-2. Với mỗi task: tổng hợp `verify_status` của tất cả TC linked.
-   - **Tất cả `passed`** → đề xuất `update_task(taskId, meta_status="DONE")` + `add_comment` chứa kết quả tóm tắt (round, env, link evidence).
-   - **Có ≥1 `failed`** → đề xuất `update_task(meta_status="IN_PROGRESS")` (lùi về để dev fix) + `add_comment` chỉ rõ TC fail nào.
+2. Với mỗi task: tổng hợp `verify_status` của tất cả TC linked + kiểm bug INTRINSIC open (`list_tasks(type="BUG", bug_origin="INTRINSIC", linked_task_id=<task id>)`).
+   - **Tất cả `passed` + không bug INTRINSIC open** → đề xuất `update_task(taskId, meta_status="DONE")` + `add_comment` kết quả tóm tắt (round, env, link evidence).
+   - **Có ≥1 `failed` HOẶC bug INTRINSIC open** → đề xuất `update_task(meta_status="IN_PROGRESS")` (lùi về để dev fix) + `add_comment` chỉ rõ TC fail / bug nào chặn.
    - **Có `blocked`/`pending`** → giữ `VERIFYING`, thêm comment báo trạng thái.
 3. **CHỜ User chốt** trước khi đổi trạng thái task (§2).
 
-KHÔNG tự chuyển task sang DONE chỉ vì "round này pass" — phải đếm CẢ TC linked. Sót 1 TC chưa verify = không đủ điều kiện DONE.
+KHÔNG tự chuyển task sang DONE chỉ vì "round này pass" — phải đếm CẢ TC linked + bug INTRINSIC. Nếu cố `update_task(meta_status="DONE")` khi còn chặn → backend trả `422 TASK_DONE_BLOCKED` với payload liệt kê; đọc payload, KHÔNG retry mù.
 
 ## Bước 5 — Báo cáo & bàn giao
 
@@ -141,6 +145,7 @@ Bàn giao:
 - ❌ Tự sửa nội dung TC khi thấy sai trong lúc verify — phải `add_comment` đề xuất sửa hoặc bàn giao `fare-test-authoring`. Sửa TC để "ép pass" = gian lận §7.
 - ❌ Tự đóng task `type=TEST` → DONE khi không tổng hợp đủ verify của TẤT CẢ TC linked (§6).
 - ❌ Tự tạo BUG khi TC fail (vi phạm §5) — phải hỏi User trước.
+- ❌ Tạo bug EXTRINSIC cho TC fail — phải INTRINSIC + `linked_task_id` để chặn task gốc DONE.
 - ❌ Bỏ qua `actual_result` khi fail — không có evidence, lần sau review không hiểu.
 - ❌ Verify hàng loạt mà chưa trình tóm tắt round + User chốt (§2).
 - ❌ Quên truyền `linked_task_id` khi verify TC nằm trong task `type=TEST` của PM — mất truy nguồn ngược.
@@ -154,6 +159,6 @@ Bàn giao:
 - [ ] Tóm tắt round đã trình + User chốt TRƯỚC khi `update_test_case` hàng loạt (§2).
 - [ ] Mỗi `verify` có `actual_result` khi fail; `note` ghi env / browser / dataset.
 - [ ] `linked_task_id` truyền khi TC nằm trong task `type=TEST`.
-- [ ] Task `type=TEST` chỉ đề xuất DONE khi MỌI TC linked passed (§6).
-- [ ] Fail → bàn giao `fare-bug-reporting` (hỏi User trước create BUG, §5).
+- [ ] Task `type=TEST` chỉ đề xuất DONE khi MỌI TC linked passed + không bug INTRINSIC open (§6).
+- [ ] Fail → bàn giao `fare-bug-reporting` (hỏi User trước create BUG, §5); bug từ TC fail là INTRINSIC + linked task gốc.
 - [ ] KHÔNG tự sửa nội dung TC để ép pass.
