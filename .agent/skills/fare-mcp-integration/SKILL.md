@@ -55,6 +55,7 @@ Bug (`type=BUG`) trên FARE có `bug_origin` quyết định nó có chặn task
 **Filter bug nội sinh của 1 task:** `list_tasks(projectCode, type="BUG", bug_origin="INTRINSIC", linked_task_id=<id>)`.
 
 ## Bẫy không hiển nhiên
+- **Param SAI TÊN bị REJECT, KHÔNG bị bỏ qua âm thầm.** FARE MCP bật **strict validation** — truyền key không có trong schema → lỗi `-32602 Input validation error: Unrecognized key: "<tên>"`. Vd `list_tasks(search=...)` sai vì param đúng là `q` → tool BÁO LỖI thay vì trả data nhiễu. Gặp lỗi này: ĐỪNG đoán lại tên param — **đọc mô tả tool** (luôn có trong danh sách tool) để lấy đúng tên field. KHÔNG tự "ảo" tên param từ tool khác (mỗi tool có schema riêng).
 - **Optional param — KHÔNG truyền `null`.** Field không đổi → bỏ hẳn khỏi payload. Truyền `null` cho field số (`folder_id`, `module_id`...) → lỗi `-32602 Input validation error`.
 - **Folder & vị trí tài liệu:**
   - *Quản lý folder:* tool `manage_folder` — `action: create | update | delete` (tạo / đổi tên + di chuyển / xóa folder Custom). `action="delete"` cần `confirm=true` — xóa kéo theo nội dung bên trong (xóa mềm, khôi phục được từ Trash).

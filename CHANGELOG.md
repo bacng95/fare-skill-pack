@@ -20,9 +20,10 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
   - `fare-test-execution`: TC fail tạo bug INTRINSIC chặn task gốc; đối chiếu bug INTRINSIC open khi đề xuất task TEST → DONE.
   - `fare-self-verify`: Dev check bug INTRINSIC open trước khi handoff/DONE.
   - `fare-backlog-grooming`: bucket mới — task chặn bởi bug INTRINSIC, bug INTRINSIC mồ côi, EXTRINSIC tồn đọng.
+- `fare-mcp-integration`: note về **strict param validation** — param sai tên bị reject (`Unrecognized key`) thay vì bỏ qua âm thầm; gặp lỗi thì đọc lại mô tả tool, không tự đoán tên param.
 
 ### Notes
-- Yêu cầu FARE backend có migration `tasks.bug_origin` + MCP tool contract expose `bug_origin` / `linked_task_id` (CREATE/UPDATE/LIST task). Skill pack v1.1.0 đi kèm backend tương thích.
+- Yêu cầu FARE backend có: migration `tasks.bug_origin` + MCP tool contract expose `bug_origin` / `linked_task_id` (CREATE/UPDATE/LIST task) + strict tool input validation. Skill pack v1.1.0 đi kèm backend tương thích.
 
 ---
 
