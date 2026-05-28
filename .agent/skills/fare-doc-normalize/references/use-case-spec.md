@@ -58,34 +58,15 @@ Mục nào nguồn không có → BỎ (không bịa cho đủ).
 - Tham chiếu chéo: `{số} {tên đầy đủ}`, không để số trần.
 - Nhãn trạng thái thủ công trong heading nguồn ("- DONE", "– WIP"): BỎ khỏi heading khi normalize (trạng thái nằm trên FARE, không trong nội dung) — nhưng đây là quyết định FORM; nếu không chắc, giữ + `⚠️`.
 
-## Markup mang ý nghĩa NỘI DUNG — KHÔNG được tự xử như form
-`<s>`, `<mark>`, comment-highlight KHÔNG phải markup trang trí — chúng mang ngữ nghĩa. normalize chỉ đổi FORM, nên:
-- **`<s>...</s>` (gạch ngang)** = nội dung người soạn đã BỎ. Vd `Khối <s>(Bắt buộc)</s>` = khối không còn bắt buộc; `<s>Tên riêng (Bắt buộc)</s>` + con gạch hết = field bị loại.
-  - Markdown: giữ bằng `~~...~~` (strikethrough) HOẶC ghi rõ `(đã bỏ)` — chọn 1, nhất quán. KHÔNG xóa hẳn (mất dấu vết quyết định), KHÔNG coi như còn hiệu lực (vd KHÔNG ghi "Khối (Bắt buộc)").
-  - Nếu cả field bị gạch → giữ field dưới dạng `~~Tên riêng (Bắt buộc)~~` + `⚠️ field này nguồn đã gạch bỏ — xác nhận có loại không`.
-- **`<mark>...</mark>` (highlight)** = điểm người soạn nhấn / chưa chốt. Bỏ thẻ `<mark>` (đó là màu nền — form) NHƯNG nếu nhiều mark cụm lại ở 1 field → ghi `⚠️ điểm nhấn/chưa chốt` 1 lần cho cụm.
-- **`comment-highlight` (`data-comment-id`)** = có thảo luận chưa chốt mà agent không đọc được → giữ text, thêm `⚠️ điểm mở (có comment chưa chốt)`.
+## Tham chiếu cú pháp (script `scripts/html_to_md.py` tự làm; mục này để hiểu output + fallback tay)
 
-Tóm: form (bảng HTML, `<strong>`, `<mark>` màu nền, data-id) → làm sạch thoải mái. Ngữ nghĩa (`<s>` = đã bỏ, comment = chưa chốt) → BẢO TOÀN + ⚠️.
+**Bậc thụt lề đa kiểu** → bullet `-` theo độ sâu. Tín hiệu bậc (nhận hết): `<ul><li>` lồng · `<p data-indent="N">` / `padding-left:Npx` (~32px = 1 bậc) · marker `⟨INDENT:pl=N⟩` (bỏ marker, bậc = N/32) · dòng mở đầu `+`/`-`. `<ul><li>` rỗng → bỏ. KHÔNG đổi thứ tự / gộp / tách dòng.
 
-## Dựng bậc bullet từ indent ĐA KIỂU
-HTML từ Word/editor mã hóa bậc thụt lề **nhiều cách lẫn lộn trong cùng tài liệu** — KHÔNG chỉ `<ul><li>`. Phải nhận tất cả như tín hiệu BẬC và gom về bullet markdown chuẩn theo độ sâu:
+**Ảnh** `<img src="fare://files/{key}" alt="...">` → `![Ảnh minh hoạ](fare://files/{key})`: GIỮ ref, **BỎ alt** (caption AI noise). Nội dung yêu cầu nằm ở text quanh ảnh — giữ nguyên.
 
-| Tín hiệu nguồn | Nghĩa | Quy về |
-|---|---|---|
-| `<ul><li>` lồng | bậc theo độ lồng | bullet `-` theo độ sâu |
-| `<p data-indent="N" style="padding-left:Npx">` | bậc = N (hoặc px/32) | bullet `-` ở bậc N |
-| `⟨INDENT:pl=NNN⟩` ở đầu text | **marker điều khiển** của editor — pl=px | BỎ marker; bậc = round(NNN/32) |
-| Dòng mở đầu bằng `+` hoặc `-` (trong nội dung) | sub-bullet người soạn tự gõ | bullet con 1 bậc sâu hơn dòng cha |
-| `<ul><li><p></p></li></ul>` rỗng | rác từ Word | BỎ hẳn |
+**Markup ngữ nghĩa — BẢO TOÀN, không xử như form:**
+- `<s>...</s>` = nội dung đã BỎ → giữ `~~...~~`. Cả field bị gạch → `~~...~~` + `⚠️ nguồn đã bỏ, xác nhận`. KHÔNG coi như còn hiệu lực.
+- `<mark>` = highlight (màu nền) → bỏ thẻ; cụm mark ở 1 field → `⚠️ điểm chưa chốt`.
+- `comment-highlight` = thảo luận chưa chốt → giữ text + `⚠️ (comment chưa chốt)`.
 
-- Quy đổi px → bậc: ~32px = 1 bậc (padding-left:32→bậc1, 64→bậc2, 128→bậc4). Không cần chính xác tuyệt đối — giữ ĐÚNG THỨ TỰ cha/con tương đối là đủ.
-- Marker `⟨INDENT:pl=NNN⟩`, `data-id`, `style`, `data-indent`, `colspan` → tất cả là FORM/control → bỏ sạch trong output.
-- KHÔNG đổi thứ tự, KHÔNG gộp/tách dòng — chỉ chuẩn hóa cách biểu diễn bậc. Mỗi dòng truy ngược 1:1 về nguồn.
-
-## Ảnh nhúng
-`<img src="fare://files/{key}" alt="<caption AI dài + noise>">`:
-- Ảnh là minh họa UI; **nội dung yêu cầu nằm ở text quanh ảnh** (giữ nguyên text đó).
-- Chuyển thành: `![Ảnh minh hoạ](fare://files/{key})` HOẶC `[Ảnh: <mô tả ngắn 1 dòng nếu cần>](fare://files/{key})`. GIỮ ref `fare://files/{key}`.
-- **BỎ alt caption AI** ("LightRAG Schema", "Nodes/Edges", mô tả pixel chi tiết) — đó là noise, KHÔNG phải đặc tả. KHÔNG chép vào nội dung.
-- Ảnh nằm giữa một bước/field → đặt ref ảnh ngay tại vị trí đó, không tách rời khỏi ngữ cảnh.
+Strip sạch: `data-id`, `style`, `colspan`, `⟨INDENT⟩`, `&nbsp;`.
