@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// fare-skill — CLI cho @fare/skill-pack
+// fare-skill — CLI cho fare-skill-pack
 // Subcommands: init | update | uninstall | register-mcp | help
 //
 // Zero deps (chi dung Node stdlib).
@@ -10,6 +10,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout, argv, exit } from 'node:process';
+import { buildClaude, CLAUDE_SUBDIRS } from './lib/build-claude.mjs';
 
 // ============================================================
 // Constants
@@ -64,12 +65,26 @@ function bail(msg, code = 1) {
     exit(code);
 }
 
+// Sinh .claude/ (Claude Code) tu .agent/ (Antigravity) — cung bo chuyen doi
+// ma tac gia dung qua `npm run sync:claude`. Chi dung 3 subdir, khong cham settings.
+async function generateClaude(target) {
+    const dstClaude = join(target, '.claude');
+    const existing = CLAUDE_SUBDIRS.filter((d) => existsSync(join(dstClaude, d)));
+    if (existing.length) {
+        warn(`.claude/{${existing.join(',')}} đã tồn tại — sẽ ghi đè (settings.json giữ nguyên).`);
+        const yes = await confirm('Tiếp tục sinh .claude/?', true);
+        if (!yes) { info('Bỏ qua .claude/. Antigravity (.agent/) vẫn cài bình thường.'); return; }
+    }
+    const r = await buildClaude({ agentDir: join(target, '.agent'), claudeDir: dstClaude });
+    ok(`Đã sinh .claude/ cho Claude Code → ${r.skills} skills · ${r.agents} agents · ${r.commands} commands`);
+}
+
 // ============================================================
 // Commands
 // ============================================================
 
 async function cmdInit(args) {
-    log(bold(`\n@fare/skill-pack v${VERSION} — init\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — init\n`));
 
     // 1. Target dir
     const cwd = process.cwd();
@@ -90,7 +105,7 @@ async function cmdInit(args) {
         warn(`${dstAgent} đã tồn tại.`);
         const yes = await confirm('Ghi đè (mất dữ liệu hiện có)?');
         if (!yes) {
-            info('Hủy. Để cập nhật → dùng `npx @fare/skill-pack update`.');
+            info('Hủy. Để cập nhật → dùng `npx fare-skill-pack update`.');
             return;
         }
         await rm(dstAgent, { recursive: true, force: true });
@@ -101,45 +116,27 @@ async function cmdInit(args) {
         bail(`Template không tồn tại trong package: ${TEMPLATE_AGENT}\n(Package có thể bị lỗi cài đặt. Thử cài lại.)`);
     }
     await cp(TEMPLATE_AGENT, dstAgent, { recursive: true });
-    ok(`Đã copy bộ skill → ${dstAgent}`);
+    ok(`Đã copy bộ skill (Antigravity) → ${dstAgent}`);
 
-    // 4. MCP register info — KHÔNG tự exec
-    log('');
-    info('Bước tiếp theo — đăng ký MCP server FARE với Claude Code:');
-    log('');
-    const endpoint = await prompt('  FARE MCP endpoint', 'http://localhost:3002/mcp');
-    const apiKey = await prompt('  FARE API key (sẽ KHÔNG được tự exec — chỉ in lệnh)');
-    const scope = await prompt('  Scope (local|user|project)', 'user');
+    // Sinh .claude/ cho Claude Code tu .agent/ vua copy
+    await generateClaude(target);
 
     log('');
-    log(bold('Chạy lệnh sau để register MCP:'));
-    log('');
-    if (apiKey) {
-        log(`  ${C.cyan}claude mcp add --transport http --scope ${scope} fare ${endpoint} \\${C.reset}`);
-        log(`  ${C.cyan}    --header "Authorization: Bearer ${apiKey}"${C.reset}`);
-    } else {
-        warn('Không nhập API key. Lệnh template:');
-        log(`  ${C.cyan}claude mcp add --transport http --scope ${scope} fare ${endpoint} \\${C.reset}`);
-        log(`  ${C.cyan}    --header "Authorization: Bearer YOUR_KEY"${C.reset}`);
-    }
-    log('');
-    log(bold('Sau đó:'));
-    log('  1. Restart Claude Code (hoặc gõ /mcp reconnect trong phiên hiện tại).');
-    log('  2. Đọc hướng dẫn dùng: ' + dim(`${dstAgent}/USAGE.md`));
-    log('  3. Thử ngay: ' + dim('/fare-ba [project-code] [tên tính năng]'));
-    log('');
-    ok('Cài đặt hoàn tất.');
+    log(bold('Bước tiếp theo:'));
+    log('  1. Đăng ký FARE MCP server (nếu chưa): ' + dim('npx fare-skill-pack register-mcp'));
+    log('  2. Restart Claude Code hoặc gõ ' + dim('/mcp reconnect') + ' để load tool + skill.');
+    log('  3. Đọc hướng dẫn: ' + dim(`${dstAgent}/USAGE.md`));
 }
 
 async function cmdUpdate(args) {
-    log(bold(`\n@fare/skill-pack v${VERSION} — update\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — update\n`));
 
     const cwd = process.cwd();
     const target = resolve(cwd, args[0] || cwd);
     const dstAgent = join(target, '.agent');
 
     if (!existsSync(dstAgent)) {
-        bail(`Không tìm thấy .agent/ ở ${target}\nDùng \`npx @fare/skill-pack init\` để cài lần đầu.`);
+        bail(`Không tìm thấy .agent/ ở ${target}\nDùng \`npx fare-skill-pack init\` để cài lần đầu.`);
     }
     if (!existsSync(TEMPLATE_AGENT)) {
         bail(`Template không tồn tại trong package: ${TEMPLATE_AGENT}`);
@@ -163,13 +160,17 @@ async function cmdUpdate(args) {
     await rm(dstAgent, { recursive: true, force: true });
     await cp(TEMPLATE_AGENT, dstAgent, { recursive: true });
     ok(`Đã cập nhật → ${dstAgent}`);
+
+    // Sinh lai .claude/ cho khop version moi
+    await generateClaude(target);
+
     log('');
     info('Backup giữ ở: ' + backup + ' (xóa khi đã verify).');
     info('Nếu rule MCP đổi → cân nhắc /mcp reconnect.');
 }
 
 async function cmdUninstall(args) {
-    log(bold(`\n@fare/skill-pack v${VERSION} — uninstall\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — uninstall\n`));
 
     const cwd = process.cwd();
     const target = resolve(cwd, args[0] || cwd);
@@ -189,12 +190,24 @@ async function cmdUninstall(args) {
 
     await rm(dstAgent, { recursive: true, force: true });
     ok(`Đã xóa ${dstAgent}.`);
+
+    // Gỡ 3 subdir .claude/ do bộ skill sinh ra (giữ settings.json của user)
+    const dstClaude = join(target, '.claude');
+    const generated = CLAUDE_SUBDIRS.filter((d) => existsSync(join(dstClaude, d)));
+    if (generated.length) {
+        const yes = await confirm(`Xóa luôn .claude/{${generated.join(',')}} (Claude Code)?`, true);
+        if (yes) {
+            for (const d of generated) await rm(join(dstClaude, d), { recursive: true, force: true });
+            ok(`Đã xóa .claude/{${generated.join(',')}}. (settings.json giữ nguyên)`);
+        }
+    }
+
     log('');
     info('Để gỡ MCP server: ' + dim('claude mcp remove fare'));
 }
 
 async function cmdRegisterMcp() {
-    log(bold(`\n@fare/skill-pack v${VERSION} — register-mcp\n`));
+    log(bold(`\nfare-skill-pack v${VERSION} — register-mcp\n`));
     info('Tạo lệnh đăng ký FARE MCP server với Claude Code. Lệnh sẽ được IN, KHÔNG tự exec.');
     log('');
     const endpoint = await prompt('FARE MCP endpoint', 'http://localhost:3002/mcp');
@@ -215,14 +228,14 @@ async function cmdRegisterMcp() {
 
 function cmdHelp() {
     log(`
-${bold('@fare/skill-pack')} v${VERSION}
+${bold('fare-skill-pack')} v${VERSION}
 Antigravity / Claude Code skill pack for FARE.
 
 ${bold('Cách dùng:')}
-  npx @fare/skill-pack <command> [args]
+  npx fare-skill-pack <command> [args]
 
 ${bold('Lệnh:')}
-  ${C.cyan}init${C.reset} [target]       Cài .agent/ vào workspace (default: cwd) + in lệnh register MCP.
+  ${C.cyan}init${C.reset} [target]       Cài .agent/ (Antigravity) + sinh .claude/ (Claude Code) vào workspace.
   ${C.cyan}update${C.reset} [target]     Cập nhật .agent/ lên version mới (backup tự động).
   ${C.cyan}uninstall${C.reset} [target]  Xóa .agent/ khỏi workspace (có confirm).
   ${C.cyan}register-mcp${C.reset}        Chỉ in lệnh đăng ký FARE MCP (cho ai đã có .agent/).
@@ -231,13 +244,13 @@ ${bold('Lệnh:')}
 
 ${bold('Ví dụ:')}
   ${dim('# Lần đầu cài cho workspace hiện tại')}
-  npx @fare/skill-pack init
+  npx fare-skill-pack init
 
   ${dim('# Cài cho workspace khác')}
-  npx @fare/skill-pack init ~/projects/my-app
+  npx fare-skill-pack init ~/projects/my-app
 
   ${dim('# Cập nhật khi có version mới')}
-  npx @fare/skill-pack update
+  npx fare-skill-pack update
 
 ${bold('Yêu cầu:')}
   - Node >= 18

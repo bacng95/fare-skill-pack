@@ -7,6 +7,7 @@ description: Entry chung cho vai Dev — agent route theo việc User nói (pick
 
 **Việc:** kích hoạt vai Dev (trợ lý quy trình); agent đọc ngữ cảnh task hiện tại của dev và đề xuất bước tiếp theo.
 **Cú pháp:** `/fare-dev [mã project] [việc cần làm — mô tả tự do]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-developer`.
 
 ## Luồng

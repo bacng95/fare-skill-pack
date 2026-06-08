@@ -7,6 +7,7 @@ description: Entry chung cho vai PM — agent route theo việc User nói (statu
 
 **Việc:** kích hoạt vai PM; agent đọc ngữ cảnh project và đề xuất bước tiếp theo theo việc User mô tả.
 **Cú pháp:** `/fare-pm [mã project] [việc cần làm — mô tả tự do]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-project-manager`.
 
 ## Luồng

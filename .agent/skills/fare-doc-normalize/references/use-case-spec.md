@@ -56,3 +56,17 @@ Mục nào nguồn không có → BỎ (không bịa cho đủ).
 - Nhánh điều kiện trong một bước → bullet `**Nếu …:**`.
 - `(Bắt buộc)` chỉ thêm khi nguồn ghi rõ — KHÔNG tự gán.
 - Tham chiếu chéo: `{số} {tên đầy đủ}`, không để số trần.
+- Nhãn trạng thái thủ công trong heading nguồn ("- DONE", "– WIP"): BỎ khỏi heading khi normalize (trạng thái nằm trên FARE, không trong nội dung) — nhưng đây là quyết định FORM; nếu không chắc, giữ + `⚠️`.
+
+## Tham chiếu cú pháp (script `scripts/html_to_md.py` tự làm; mục này để hiểu output + fallback tay)
+
+**Bậc thụt lề đa kiểu** → bullet `-` theo độ sâu. Tín hiệu bậc (nhận hết): `<ul><li>` lồng · `<p data-indent="N">` / `padding-left:Npx` (~32px = 1 bậc) · marker `⟨INDENT:pl=N⟩` (bỏ marker, bậc = N/32) · dòng mở đầu `+`/`-`. `<ul><li>` rỗng → bỏ. KHÔNG đổi thứ tự / gộp / tách dòng.
+
+**Ảnh** `<img src="fare://files/{key}" alt="...">` → `![Ảnh minh hoạ](fare://files/{key})`: GIỮ ref, **BỎ alt** (caption AI noise). Nội dung yêu cầu nằm ở text quanh ảnh — giữ nguyên.
+
+**Markup ngữ nghĩa — BẢO TOÀN, không xử như form:**
+- `<s>...</s>` = nội dung đã BỎ → giữ `~~...~~`. Cả field bị gạch → `~~...~~` + `⚠️ nguồn đã bỏ, xác nhận`. KHÔNG coi như còn hiệu lực.
+- `<mark>` = highlight (màu nền) → bỏ thẻ; cụm mark ở 1 field → `⚠️ điểm chưa chốt`.
+- `comment-highlight` = thảo luận chưa chốt → giữ text + `⚠️ (comment chưa chốt)`.
+
+Strip sạch: `data-id`, `style`, `colspan`, `⟨INDENT⟩`, `&nbsp;`.

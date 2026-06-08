@@ -3,6 +3,19 @@ template/
 *.tgz
 .DS_Store
 *.log
-docs/outputs/
+
+# .claude/ sinh tu .agent/ qua `npm run sync:claude` — generated, khong commit.
+# Giu .claude/settings*.json (cau hinh that, track tay neu can).
+/.claude/skills/
+/.claude/agents/
+/.claude/commands/
+
+# BA draft outputs (root level only — .agent/docs/outputs/ giữ làm template empty dir)
+/docs/outputs/
+
+# Local secrets
 .env
 .env.local
+
+# Python helper scripts trong /docs/outputs/ (legacy)
+/docs/**/*.py

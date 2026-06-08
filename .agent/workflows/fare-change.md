@@ -7,6 +7,7 @@ description: Xử lý yêu cầu thay đổi (change request) trên một spec �
 
 **Việc:** sửa một spec đã có theo yêu cầu thay đổi của khách / stakeholder; không mất truy vết bản cũ; báo cáo impact lên artifact downstream.
 **Cú pháp:** `/fare-change [mã project] [id spec] ["mô tả thay đổi"]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-business-analyst` (chạy skill `fare-change-request`).
 
 ## Luồng

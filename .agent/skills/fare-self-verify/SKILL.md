@@ -48,6 +48,11 @@ Hỏi dev (CHỜ trả lời từng câu):
 - [ ] Nếu task đổi API contract → đã `update_document(api_doc id, ...)` chưa? Quên = phá hợp đồng (bàn giao BA hoặc tự update qua `fare-technical-writer`).
 - [ ] Nếu sửa schema DB → ERD đã update? (tương tự).
 
+**E. Bug nội sinh (INTRINSIC) — gate DONE**
+- [ ] `list_tasks(projectCode, type="BUG", bug_origin="INTRINSIC", linked_task_id=<task này>)` — còn bug INTRINSIC nào chưa `DONE` không?
+- [ ] Còn bug INTRINSIC open → task này **KHÔNG thể DONE** (backend chặn `422 TASK_DONE_BLOCKED`). Phải fix + đóng bug trước. Handoff VERIFYING vẫn được (bug sẽ được QA/dev xử trong vòng verify), nhưng báo rõ trong comment: "còn N bug INTRINSIC chặn DONE".
+- [ ] Còn TC link `failed` chưa re-verify → cũng chặn DONE. Báo QA re-verify.
+
 ### Bước 3 — Gom evidence
 
 Cần thu thập **TRƯỚC** khi chuyển VERIFYING (rule §6 — VERIFYING cần evidence):
@@ -105,7 +110,8 @@ Báo User:
 | Tình huống | Hành động |
 |---|---|
 | TC chạy tay fail | Quay lại code (giữ IN_PROGRESS). Sửa rồi self-verify lại. KHÔNG handoff VERIFYING khi biết TC fail. |
-| Phát hiện bug ở phần KHÔNG thuộc scope task này (vd dạo file thấy lỗi cũ) | Rule §5: KHÔNG tự `create_tasks(type=BUG)`. Báo User → chờ chốt. |
+| Phát hiện bug TRONG khi làm chính task này (lỗi của feature đang code) | Đây là bug INTRINSIC. Rule §5: báo User → chờ chốt → nếu tạo thì `bug_origin="INTRINSIC"`, `linked_task_id=<task này>`. Bug sẽ chặn task này DONE đến khi fix xong. |
+| Phát hiện bug ở phần KHÔNG thuộc scope task này (vd dạo file thấy lỗi cũ) | Bug EXTRINSIC (độc lập). Rule §5: KHÔNG tự `create_tasks(type=BUG)`. Báo User → chờ chốt. KHÔNG link task này (không nên chặn task không liên quan). |
 | Sửa mở rộng scope so với khi pickup (vd phải fix thêm 2 file ngoài plan) | `add_comment` ghi lý do mở rộng + báo PM (để PM cập nhật effort / chia task nếu cần). |
 | Spec mơ hồ phát hiện khi code | Bàn giao BA `/fare-change`. Có thể vẫn handoff phần đã làm, ghi rõ phần spec mơ hồ không động. |
 | API contract đổi nhưng api_doc chưa update | Update api_doc qua `/fare-write-doc` HOẶC nhờ technical-writer agent trước khi VERIFYING. |
@@ -113,6 +119,7 @@ Báo User:
 ## Anti-patterns
 
 - ❌ Set `meta_status="DONE"` tự — vi phạm §6 (chỉ VERIFYING).
+- ❌ Cố `DONE` khi còn bug INTRINSIC open hoặc TC `failed` — backend chặn `422 TASK_DONE_BLOCKED`; đọc payload thay vì retry.
 - ❌ Set `VERIFYING` không có evidence (commit hash, file đụng) — vi phạm §6.
 - ❌ Set `VERIFYING` khi biết có TC fail — gian lận quy trình.
 - ❌ Tự tạo BUG khi phát hiện lỗi khác trong scope (vi phạm §5).
@@ -131,4 +138,5 @@ Báo User:
 - [ ] User chốt handoff TRƯỚC khi `update_task` + `add_comment` (§2).
 - [ ] `actual_effort` là GIỜ (không nhầm man-days của module).
 - [ ] KHÔNG tự `DONE` (§6).
-- [ ] Phát hiện bug ngoài scope → hỏi User trước khi tạo BUG (§5).
+- [ ] Đã check bug INTRINSIC open (`list_tasks(type="BUG", bug_origin="INTRINSIC", linked_task_id=<task>)`) + TC `failed` — báo rõ nếu còn chặn DONE.
+- [ ] Bug phát hiện khi làm task này → INTRINSIC + link task này; bug ngoài scope → EXTRINSIC, không link. Cả hai đều qua §5 (hỏi User).

@@ -7,6 +7,7 @@ description: Quản Epic / initiative cross-module — tạo epic mới, đổi 
 
 **Việc:** CRUD Epic / initiative — tạo mới, đổi status / owner / dates, bulk assign tasks, đề xuất close khi đủ điều kiện.
 **Cú pháp:** `/fare-epic [mã project] [hành động? | id epic?]`
+**Đầu vào người dùng:** $ARGUMENTS
 - Không tham số sau project → liệt epic hiện có (`query_epics` LIST), hỏi User muốn làm gì.
 - `[hành động?]`: `create` · `status` · `assign-tasks` · `close`.
 - `[id epic?]`: làm việc với 1 epic cụ thể.

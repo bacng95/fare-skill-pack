@@ -35,19 +35,39 @@ KHÔNG hỏi quy ước đặt tên — đã CỐ ĐỊNH (xem **Quy chuẩn đ�
 - KHÔNG tạo file `combined` / `merged` / `full_doc` — đọc nguồn trực tiếp từ FARE từng phần.
 
 ## Bước 1 — Lập danh sách section (checklist chống sót)
-Đọc lướt nguồn, liệt kê **toàn bộ heading** (1.1 … 1.N). Giữ danh sách này làm checklist để cuối cùng đối chiếu — không sót section nào.
+Đọc lướt **HẾT** các trang nguồn (lặp `read_document(page=N)` tới `has_more=false`), liệt kê **toàn bộ heading** (1.1 … 1.N hoặc 3.1 … 3.N). Giữ danh sách này làm checklist để cuối cùng đối chiếu — không sót, không lẫn section nào. Ghi cả nhãn thủ công nếu có (vd "3.1 Thêm mới lớp - DONE") để biết section nào người soạn đánh dấu xong.
 
 ## Bước 2 — Xử lý TỪNG PHẦN → ghi nháp LOCAL
 KHÔNG đọc rồi giữ cả tài liệu trong đầu — tài liệu người dùng thường rất lớn, gom hết sẽ tràn ngữ cảnh và mất mạch (kể cả model mạnh).
 
-Lặp cho tới hết:
-1. Đọc **một phần** nguồn (1–2 section) **trực tiếp từ FARE** — `read_document(id, version=N)`, ghim đúng `version` đã chốt ở Bước 0. KHÔNG clone cả doc nguồn về local.
-2. Tách phần đó ra — chép **trung thực** nội dung của section. CHƯA làm form đẹp ở bước này: bảng HTML của nguồn cứ giữ nguyên. Làm sạch form là việc riêng — skill `fare-doc-normalize`, User chạy sau.
-3. **Ghi ra file nháp `.md` local** — đường dẫn & tên đúng **Quy chuẩn đặt tên** (ở trên). Mỗi file MỞ ĐẦU bằng dòng provenance: `> Nguồn: fare://documents/{id} · version {N} · tách {ngày}` (`fare-rules §8`).
-4. **Tham chiếu chéo** ("1.16", "2.15"…): KHÔNG để số trần. Viết thành `{số} {tên đầy đủ của mục}` (vd `2.15 Thêm mới trường ĐH/Cao đẳng của trợ giảng`). Tên lấy từ: cùng doc → danh sách heading (Bước 1); khác doc → tra tiêu đề doc đích (`list_documents`). Không tra được tên → giữ số + `⚠️ chưa phân giải`, KHÔNG đoán. Link `fare://...` thật sẽ thêm ở Bước 4.
-5. Tổng kết ngắn tiến độ ("đã xong 1.1–1.4 / 1.20") rồi đọc phần kế.
+### ⚠️ `read_document` phân trang theo KÝ TỰ, KHÔNG theo section
+Đây là bẫy lớn nhất khi tách. `read_document(id, page=N)` (mode markdown) chia tài liệu thành trang ~vài KB **theo số ký tự** — cắt NGANG bất kỳ đâu: giữa một `<table>`, giữa một `<ul>`, giữa một section. Thực tế quan sát: 1 section đặc tả thường trải **1–2 trang**, và **một trang chứa phần cuối section này + phần đầu section kế**. KHÔNG bao giờ giả định "1 page = 1 section".
+
+**Hệ quả nếu làm sai:** đọc page 1, tưởng đó là trọn section 3.1 rồi tách luôn → MẤT phần cuối 3.1 (nằm page 2) HOẶC nuốt nhầm đầu 3.2. Đây là vi phạm §7 (mất nội dung) — lỗi nặng nhất khi tách.
+
+### Vòng lặp đúng: đọc tuần tự + GHÉP theo ranh giới heading
+1. Đọc **tuần tự từng page** `read_document(id, page=N, version=V)` — ghim `version` đã chốt ở Bước 0. Đọc tiếp `page=N+1` khi `pagination.has_more=true`.
+2. Giữ một **buffer nối**: ghép text các page lại. Ranh giới section = dòng heading section (`### **3.1 …**`, `### **3.2 …**`…). Một section CHỈ được coi là "đọc đủ" khi đã thấy **heading section KẾ TIẾP** (hoặc `has_more=false` = hết doc).
+3. Khi đã có trọn 1 section trong buffer → tách section đó ra (Bước 2a–2d dưới). Phần text còn dư sau heading kế tiếp (= đầu section sau) GIỮ trong buffer cho vòng sau, KHÔNG vứt.
+4. Lặp tới khi hết doc + buffer rỗng. Cuối cùng đối chiếu số section tách được với checklist Bước 1 — phải khớp đủ, không sót, không lẫn.
+
+> Tài liệu rất lớn (vài chục section): có thể dùng `mode="blocks"` (phân trang theo token, trả block tree có ID ổn định) nếu cần ghim block để `patch_document` sau. Mặc định markdown + ghép như trên là đủ để tách.
+
+### Với mỗi section đã đọc đủ:
+- **2a. Chép trung thực** nội dung section. CHƯA làm form đẹp: bảng HTML của nguồn cứ giữ nguyên. Làm sạch form là việc riêng — skill `fare-doc-normalize`, User chạy sau.
+- **2b. Ghi ra file nháp `.md` local** — đường dẫn & tên đúng **Quy chuẩn đặt tên**. Mỗi file MỞ ĐẦU bằng dòng provenance: `> Nguồn: fare://documents/{id} · version {N} · tách {ngày}` (`fare-rules §8`).
+- **2c. Nhãn trạng thái thủ công trong heading** ("- DONE", "– WIP", gạch ngang heading): là chú thích người soạn, KHÁC `status` hệ thống (xem `fare-context-discovery`). Tên FILE bỏ nhãn (`3.1-them-moi-lop.md`, KHÔNG `..._done`). Trong NỘI DUNG: giữ nguyên nhãn (trung thực) — normalize sẽ quyết bỏ/giữ, không phải split.
+- **2d. Tham chiếu chéo** mọi dạng: số trần "1.16", "(Mục 2.8)", "tại 13.4", "Mục 4.5". KHÔNG để số trần / số trong ngoặc đứng một mình. Viết thành `{số} {tên đầy đủ của mục}` (vd `(Mục 2.8 Thêm mới phòng học tại trường)`). Tên lấy từ: cùng doc → checklist heading (Bước 1); khác doc → tra tiêu đề doc đích (`list_documents`). Không tra được tên, hoặc số lạ/nghi typo (vd "13.4" trong doc chỉ có mục 3.x) → giữ số + `⚠️ chưa phân giải`, KHÔNG đoán. Link `fare://...` thật thêm ở Bước 4.
+- **2e. Tổng kết ngắn** tiến độ ("đã xong 3.1–3.3 / 3.7") rồi đọc phần kế.
 
 Phần dùng chung (vai trò, quy tắc validate SĐT / email / ngày, danh mục drop-down) → tách thành 1 file riêng.
+
+### 2f. Giữ RAW, ghi sổ ⚠️ — không sửa thầm (§7)
+Split chỉ chép trung thực; làm sạch form (table, indent, ảnh, markup) là việc `fare-doc-normalize`. Vì vậy ở split: **giữ nguyên xi** HTML/`<img>`/`<s>`/`<mark>`/marker `⟨INDENT⟩`, KHÔNG xử lý. Chỉ cần **ghi vào sổ ⚠️** (báo User ở Bước 3) hai loại:
+- **Lỗi nguồn:** typo, copy-paste sai (Title ≠ heading, description/Post-condition dán nhầm mục khác, "trợ giảng" lẫn trong doc "lớp"), số mục lạ. KHÔNG tự sửa.
+- **Markup ngữ nghĩa (≠ form):** `<s>` = nội dung đã bỏ (vd "Khối <s>(Bắt buộc)</s>"); `comment-highlight` = điểm chưa chốt; `<mark>` cụm = điểm cần xác nhận. Đánh dấu vị trí để normalize/User xử đúng — KHÔNG tự coi như còn/hết hiệu lực.
+
+Ảnh nhúng: ghi nhận có ảnh (`<img fare://files/..>`); KHÔNG chép `alt`/`imageSummaries` (caption AI, nhiều noise) làm nội dung.
 
 ## Bước 3 — Báo cáo & DỪNG chờ duyệt
 Xong toàn bộ nháp local → báo User gọn: số file, đường dẫn `docs/outputs/...`, và sổ `⚠️` lỗi nguồn / điểm suy luận (nếu có).
@@ -69,9 +89,14 @@ Chỉ làm khi User đã duyệt nháp VÀ ra lệnh đẩy.
 `create_document` · `patch_document` (richtext) · `update_document` (structured JSON). Không `delete_document` / ghi đè khi chưa có lệnh trực tiếp.
 
 ## Tự kiểm
-- [ ] Số doc tách khớp đủ danh sách heading Bước 1 — không sót section.
+- [ ] Đã đọc HẾT các trang (`has_more=false`); ghép phần bị pagination cắt ngang — KHÔNG coi 1 page = 1 section.
+- [ ] Mỗi section chỉ "đóng" khi đã thấy heading section kế tiếp (hoặc hết doc) — không sót đuôi, không lẫn đầu section sau.
+- [ ] Số doc tách khớp đủ danh sách heading Bước 1 — không sót, không lẫn.
 - [ ] Mọi nội dung truy ngược được về nguồn — không tự chế, không "lỗi" tưởng tượng.
-- [ ] Suy luận / lỗi nguồn đều có `⚠️` và đã báo User.
+- [ ] `<s>` giữ nguyên (nội dung đã bỏ), `<mark>` / comment-highlight đánh dấu ⚠️ điểm mở.
+- [ ] Tên file bỏ nhãn "- DONE"; nội dung heading giữ nhãn (normalize quyết sau).
+- [ ] Cross-ref mọi dạng (số trần / "(Mục X.Y)" / số lạ) → `{số} {tên}` hoặc `⚠️ chưa phân giải`.
+- [ ] Suy luận / lỗi nguồn / điểm mở đều có `⚠️` trong sổ và đã báo User.
 - [ ] Đã nháp local + chờ User duyệt TRƯỚC khi đẩy FARE.
 - [ ] Vị trí đẩy lên FARE: đã đọc `knowledge-tree`, đặt theo cách project tổ chức tài liệu tương tự + User chốt — KHÔNG mặc định folder nguồn, cũng không mặc định Module.
 - [ ] Không doc nào set `approved`; không tự tạo module / folder.

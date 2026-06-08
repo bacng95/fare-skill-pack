@@ -27,29 +27,36 @@ Mỗi loại tài liệu có khuôn riêng trong `references/`. KHÔNG dùng m�
 | Đặc tả chức năng trong SRS (dạng use-case: Overview + Basic Flow…) | `references/use-case-spec.md` |
 | *(loại khác)* | *chưa có — bổ sung khi gặp* |
 
-## Được phép vs Cấm (áp dụng mọi loại)
-
-| Được phép — FORM | Cấm — NỘI DUNG |
-|---|---|
-| Bảng `<table>` HTML → heading + bullet / bảng markdown gọn | Thêm / bớt / đổi yêu cầu, giá trị, rule |
-| Bỏ rác: `data-id`, `colspan`, style inline, `<mark>` rỗng | Tự điền field nguồn để trống (vd cờ "Bắt buộc") |
-| Gom các dòng rời thành mục có heading | "Sửa cho hợp lý", suy luận thêm |
-| Sửa markup gãy (thẻ hở) | Tự sửa lỗi nội dung của nguồn |
-| Tham chiếu số mục trần ("2.15") → `2.15 {tên đầy đủ}` (tra tên thật) | Đoán tên mục khi không tra được — thay vào đó `⚠️` |
+## Ranh giới FORM vs NỘI DUNG
+- **FORM** (được sửa thoải mái): bảng `<table>`, `data-id`/`style`/`colspan`, `<mark>` màu nền, markup gãy, bậc thụt lề, nhãn "- DONE" trong heading. Script lo phần này.
+- **NỘI DUNG** (CẤM đổi): yêu cầu, giá trị, rule, field. KHÔNG thêm/bớt/"sửa cho hợp lý", KHÔNG tự điền field để trống, KHÔNG sửa lỗi nguồn (chỉ ⚠️).
+- **Ngữ nghĩa cần BẢO TOÀN** (dễ tưởng là form): `<s>` = nội dung đã bỏ (giữ `~~..~~`, KHÔNG coi còn hiệu lực); `comment-highlight` = chưa chốt; `alt` ảnh = caption AI noise (KHÔNG chép làm nội dung).
 
 Mỗi câu sau khi làm sạch phải **truy ngược 1:1** về bản nháp gốc.
 
-## Quy trình
-1. Đọc file nháp; xác định loại tài liệu.
-2. Nạp khuôn `references/{loại}.md` (chưa có → DỪNG, báo User).
-3. Trình bày lại theo đúng khuôn — đối chiếu từng phần với bản gốc, đảm bảo không rơi nội dung.
-4. Ghi đè file. Báo User: đã làm sạch file nào; liệt kê `⚠️` (lỗi nguồn / điểm mơ hồ) nếu phát hiện.
-5. **DỪNG** — chờ User review. Việc đẩy lên FARE là bước sau, do User yêu cầu.
+## Quy trình — script lo CÚ PHÁP, agent lo NGỮ NGHĨA
+1. **Xác định loại** tài liệu → nạp khuôn `references/{loại}.md` (chưa có khuôn → DỪNG, báo User).
+2. **Chạy script cú pháp** (deterministic, đỡ agent làm tay dễ sót):
+   ```
+   python3 scripts/html_to_md.py <file-nhap>.md > <file-nhap>.clean.md
+   ```
+   Script là **pure local transform** (chỉ đọc/ghi text local, KHÔNG gọi MCP/DB — `fare-rules §8`). Nó lo trọn phần cú pháp: table→heading+key-value, bullet từ indent đa kiểu, `<img>`/`<s>`/`<mark>`/marker `⟨INDENT⟩`, strip rác, heading function→`#`. Chi tiết: header của script + `references/use-case-spec.md`.
+   > Script lỗi / HTML quá dị → fallback làm tay theo `references/{loại}.md`. Báo User.
+3. **Agent review + phần JUDGMENT** (script KHÔNG làm — cần hiểu ngữ cảnh):
+   - Đối chiếu output với khuôn `references/{loại}.md`: đúng thứ tự mục, nhãn chuẩn. Sửa chỗ script đặt sai mục (vd nhãn section nguồn dị).
+   - **Cross-ref**: số mục → `{số} {tên}` (tra checklist heading / `list_documents`); không tra được → `⚠️ chưa phân giải`.
+   - **Nhãn "- DONE"** trong heading: bỏ (trạng thái nằm trên FARE).
+   - **Lỗi nội dung nguồn** (typo, copy-paste sai, `<s>` field bị bỏ, `<mark>` chưa chốt): ghi `⚠️` vào sổ, KHÔNG sửa thầm (§7).
+   - Mọi câu truy ngược 1:1 về nguồn — không rơi nội dung.
+4. **Ghi đè file** bằng bản sạch. Báo User: file nào, sổ `⚠️`.
+5. **DỪNG** — chờ User review. Đẩy FARE là bước sau, do User yêu cầu.
 
 ## Tự kiểm
+- [ ] Đã chạy `scripts/html_to_md.py` cho phần cú pháp (hoặc fallback tay nếu script lỗi, có báo User).
 - [ ] Đã chọn đúng loại; output khớp khuôn trong `references/{loại}.md` (heading, thứ tự mục, nhãn).
-- [ ] Tên file & thư mục đúng **Quy chuẩn đặt tên**.
-- [ ] Không còn `<table>` / markup HTML rác.
+- [ ] Tên file & thư mục đúng **Quy chuẩn đặt tên**; nhãn "- DONE" đã bỏ khỏi heading.
+- [ ] Không còn `<table>` / `data-id` / `style` / marker `⟨INDENT⟩` / markup HTML rác.
+- [ ] `<img>` → `![](fare://files/..)` giữ ref, KHÔNG chép alt AI; `<s>` giữ `~~..~~`.
 - [ ] Mọi câu truy ngược 1:1 về bản gốc — không thêm, không bớt.
 - [ ] Field nguồn để trống vẫn để trống (không tự điền).
 - [ ] Tham chiếu chéo ở dạng `{số} {tên}` — không còn số mục trần vô nghĩa; số nào không tra được tên thì có `⚠️`.

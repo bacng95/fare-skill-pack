@@ -81,6 +81,16 @@ Mỗi task chạy qua 4 trạng thái cố định — chuyển theo timing th�
 - KHÔNG để task `IN_PROGRESS` mà không có comment giải thích đang làm gì (giúp người khác không pickup nhầm).
 - Task `type=TEST` chỉ vào DONE khi mọi TC liên quan có `update_test_case(verify={verify_status:"passed"})` ghi trong `verify_history`.
 
+**🔒 DONE Gate — FARE backend ENFORCE (không né được):**
+`update_task(meta_status="DONE")` bị backend chặn (lỗi `422` code `TASK_DONE_BLOCKED`) khi task còn:
+1. **Bug nội sinh (INTRINSIC) chưa đóng** — bug `type=BUG`, `bug_origin="INTRINSIC"`, `linked_task_id=<task này>`, `meta_status≠DONE`. Đây là bug phát sinh TRONG quá trình làm chính task này (TC verify failed, tester báo từ task drawer).
+2. **Test case status `failed` chưa re-verify** — TC link với task còn `failed`.
+
+Error payload kèm `open_intrinsic_bugs[]` + `failed_test_cases[]`. Agent gặp lỗi này:
+- KHÔNG retry mù. Đọc payload → báo User: task còn bug/TC nào chặn.
+- Đề xuất xử lý: đóng từng bug INTRINSIC (sau khi fix) hoặc re-verify TC failed → pass, RỒI mới DONE task gốc.
+- Phân biệt **bug INTRINSIC** (chặn task cha) ↔ **bug EXTRINSIC** (độc lập, production/regression/user report — KHÔNG chặn task nào). Xem `fare-mcp-integration`.
+
 **Đổi status — `meta_status` trước, `status_id` chỉ khi cần:**
 Mặc định: `update_task(meta_status="TODO"|"IN_PROGRESS"|"VERIFYING"|"DONE")` — không cần lookup gì. Chỉ khi project có workflow tùy biến (gọi `list_projects(id=<code>, include_task_statuses=true)` thấy `task_statuses` non-empty) mới dùng `status_id` lấy từ mảng đó. KHÔNG hard-code số `status_id`.
 
@@ -109,8 +119,10 @@ Agent thao tác với hệ thống FARE **chỉ** qua MCP tool / resource của 
 - Đọc file cấu hình, `.env`, secret, connection string, khóa API.
 - Kết nối trực tiếp tới database; chạy SQL hay script tay.
 - Gọi API nội bộ, dò cổng, hay bất kỳ cách "đi đường vòng" nào khác để lấy / đổi dữ liệu FARE.
-- Tự viết script / chương trình (Python, shell…) để gọi MCP server, hoặc để fetch / parse / "xử lý hàng loạt" dữ liệu FARE. **MCP tool là giao diện DUY NHẤT** — đọc tài liệu = tool `read_document` / resource, tạo tài liệu = `create_document`… Công việc = lời gọi MCP tool + suy luận của chính agent, KHÔNG phải một pipeline script tự dựng.
+- Tự viết script / chương trình (Python, shell…) **để gọi MCP server / FARE API / DB** hay đi đường vòng "lấy bằng được" dữ liệu FARE. **MCP tool là giao diện DUY NHẤT để ĐỌC/GHI FARE** — đọc = `read_document` / resource, ghi = `create_document`… KHÔNG phải pipeline script tự gọi API.
 - Lấy file local / file scratch / kết quả của một phiên chạy TRƯỚC làm "nguồn sự thật". Tài liệu sống trên FARE thì nguồn LUÔN là FARE — đọc **tươi** qua `read_document` (ghim đúng `version`) mỗi lần làm việc. File local có thể đã hỏng hoặc lệch phiên bản.
+
+> Script local thuần **biến đổi text đã đọc qua MCP** (không chạm MCP/API/DB/network) KHÔNG bị §8 cấm — đó chỉ là xử lý cú pháp trên dữ liệu agent đã có. Chi tiết & điều kiện: nằm ở skill dùng nó (vd `fare-doc-normalize`).
 
 **Provenance — file local phải tự khai xuất xứ:** mọi file `docs/outputs/` agent sinh ra từ một tài liệu FARE phải mở đầu bằng một dòng ghi rõ: nguồn (`fare://documents/{id}`), `version`, thời điểm tạo. Để bất kỳ ai (người / agent) cũng biết nháp dựa trên bản FARE nào, và kiểm được FARE đã đổi chưa.
 
