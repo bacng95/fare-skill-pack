@@ -7,6 +7,7 @@ description: Viết test case từ spec đã có (US/UC/SRS) — map AC → n TC
 
 **Việc:** từ 1 spec (User Story / Use Case / SRS) đã có AC, sinh ra ma trận TC chi tiết và đẩy lên FARE.
 **Cú pháp:** `/fare-test [mã project] [id spec hoặc id task type=TEST] [coverage?]`
+**Đầu vào người dùng:** $ARGUMENTS
 - `[coverage?]` (tùy chọn): `smoke` · `full` (mặc định) · `regression`.
 **Agent phụ trách:** `fare-qa-engineer` (chạy skill `fare-test-authoring`).
 

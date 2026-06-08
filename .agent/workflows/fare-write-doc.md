@@ -7,6 +7,7 @@ description: Viết tài liệu kỹ thuật (API doc, ERD, diagram, specificati
 
 **Việc:** viết / cập nhật một tài liệu kỹ thuật trên FARE.
 **Cú pháp:** `/fare-write-doc [mã project] [loại tài liệu?] [module?]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-technical-writer` (chạy theo SOP trong file agent đó).
 
 ## Luồng

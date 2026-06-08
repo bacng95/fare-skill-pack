@@ -7,6 +7,7 @@ description: Sau khi dev code xong, self-verify đối chiếu DoD + TC linked, 
 
 **Việc:** chốt kết quả phần dev đã code, đẩy task sang `VERIFYING` đúng quy trình (có evidence) để QA / User pickup verify.
 **Cú pháp:** `/fare-handoff [mã project] [id task]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-developer` (chạy skill `fare-self-verify`).
 
 ## Luồng

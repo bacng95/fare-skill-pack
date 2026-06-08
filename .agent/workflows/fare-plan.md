@@ -7,6 +7,7 @@ description: Dựng / hoàn thiện cây Module → Submodule → Function (3 c�
 
 **Việc:** đề xuất + tạo Module/Submodule/Function thiếu, để spec có chỗ gắn `module_id` (rule §1).
 **Cú pháp:** `/fare-plan [mã project] [phạm vi nghiệp vụ | id module gốc?]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-business-analyst` (chạy skill `fare-plan-breakdown`).
 
 ## Luồng

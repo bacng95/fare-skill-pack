@@ -10,6 +10,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout, argv, exit } from 'node:process';
+import { buildClaude, CLAUDE_SUBDIRS } from './lib/build-claude.mjs';
 
 // ============================================================
 // Constants
@@ -64,6 +65,20 @@ function bail(msg, code = 1) {
     exit(code);
 }
 
+// Sinh .claude/ (Claude Code) tu .agent/ (Antigravity) — cung bo chuyen doi
+// ma tac gia dung qua `npm run sync:claude`. Chi dung 3 subdir, khong cham settings.
+async function generateClaude(target) {
+    const dstClaude = join(target, '.claude');
+    const existing = CLAUDE_SUBDIRS.filter((d) => existsSync(join(dstClaude, d)));
+    if (existing.length) {
+        warn(`.claude/{${existing.join(',')}} đã tồn tại — sẽ ghi đè (settings.json giữ nguyên).`);
+        const yes = await confirm('Tiếp tục sinh .claude/?', true);
+        if (!yes) { info('Bỏ qua .claude/. Antigravity (.agent/) vẫn cài bình thường.'); return; }
+    }
+    const r = await buildClaude({ agentDir: join(target, '.agent'), claudeDir: dstClaude });
+    ok(`Đã sinh .claude/ cho Claude Code → ${r.skills} skills · ${r.agents} agents · ${r.commands} commands`);
+}
+
 // ============================================================
 // Commands
 // ============================================================
@@ -101,12 +116,15 @@ async function cmdInit(args) {
         bail(`Template không tồn tại trong package: ${TEMPLATE_AGENT}\n(Package có thể bị lỗi cài đặt. Thử cài lại.)`);
     }
     await cp(TEMPLATE_AGENT, dstAgent, { recursive: true });
-    ok(`Đã copy bộ skill → ${dstAgent}`);
+    ok(`Đã copy bộ skill (Antigravity) → ${dstAgent}`);
+
+    // Sinh .claude/ cho Claude Code tu .agent/ vua copy
+    await generateClaude(target);
 
     log('');
     log(bold('Bước tiếp theo:'));
     log('  1. Đăng ký FARE MCP server (nếu chưa): ' + dim('npx fare-skill-pack register-mcp'));
-    log('  2. Restart Claude Code hoặc gõ ' + dim('/mcp reconnect') + ' để load tool.');
+    log('  2. Restart Claude Code hoặc gõ ' + dim('/mcp reconnect') + ' để load tool + skill.');
     log('  3. Đọc hướng dẫn: ' + dim(`${dstAgent}/USAGE.md`));
 }
 
@@ -142,6 +160,10 @@ async function cmdUpdate(args) {
     await rm(dstAgent, { recursive: true, force: true });
     await cp(TEMPLATE_AGENT, dstAgent, { recursive: true });
     ok(`Đã cập nhật → ${dstAgent}`);
+
+    // Sinh lai .claude/ cho khop version moi
+    await generateClaude(target);
+
     log('');
     info('Backup giữ ở: ' + backup + ' (xóa khi đã verify).');
     info('Nếu rule MCP đổi → cân nhắc /mcp reconnect.');
@@ -168,6 +190,18 @@ async function cmdUninstall(args) {
 
     await rm(dstAgent, { recursive: true, force: true });
     ok(`Đã xóa ${dstAgent}.`);
+
+    // Gỡ 3 subdir .claude/ do bộ skill sinh ra (giữ settings.json của user)
+    const dstClaude = join(target, '.claude');
+    const generated = CLAUDE_SUBDIRS.filter((d) => existsSync(join(dstClaude, d)));
+    if (generated.length) {
+        const yes = await confirm(`Xóa luôn .claude/{${generated.join(',')}} (Claude Code)?`, true);
+        if (yes) {
+            for (const d of generated) await rm(join(dstClaude, d), { recursive: true, force: true });
+            ok(`Đã xóa .claude/{${generated.join(',')}}. (settings.json giữ nguyên)`);
+        }
+    }
+
     log('');
     info('Để gỡ MCP server: ' + dim('claude mcp remove fare'));
 }
@@ -201,7 +235,7 @@ ${bold('Cách dùng:')}
   npx fare-skill-pack <command> [args]
 
 ${bold('Lệnh:')}
-  ${C.cyan}init${C.reset} [target]       Cài .agent/ vào workspace (default: cwd) + in lệnh register MCP.
+  ${C.cyan}init${C.reset} [target]       Cài .agent/ (Antigravity) + sinh .claude/ (Claude Code) vào workspace.
   ${C.cyan}update${C.reset} [target]     Cập nhật .agent/ lên version mới (backup tự động).
   ${C.cyan}uninstall${C.reset} [target]  Xóa .agent/ khỏi workspace (có confirm).
   ${C.cyan}register-mcp${C.reset}        Chỉ in lệnh đăng ký FARE MCP (cho ai đã có .agent/).

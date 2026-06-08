@@ -7,6 +7,7 @@ description: Grooming backlog — quét task lệch trạng thái, bug chưa tri
 
 **Việc:** review backlog định kỳ (cuối ngày / cuối tuần / cuối sprint), phát hiện task lệch trạng thái và bug chưa triage.
 **Cú pháp:** `/fare-groom [mã project] [plan_month_id?] [health-check|bug-triage|sprint-close?]`
+**Đầu vào người dùng:** $ARGUMENTS
 - `[plan_month_id?]` (tùy chọn): ID month plan cụ thể; bỏ trống = quét toàn project.
 - Loại review mặc định: `health-check`.
 **Agent phụ trách:** `fare-project-manager` (chạy skill `fare-backlog-grooming`).

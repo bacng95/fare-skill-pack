@@ -4,6 +4,12 @@ template/
 .DS_Store
 *.log
 
+# .claude/ sinh tu .agent/ qua `npm run sync:claude` — generated, khong commit.
+# Giu .claude/settings*.json (cau hinh that, track tay neu can).
+/.claude/skills/
+/.claude/agents/
+/.claude/commands/
+
 # BA draft outputs (root level only — .agent/docs/outputs/ giữ làm template empty dir)
 /docs/outputs/
 

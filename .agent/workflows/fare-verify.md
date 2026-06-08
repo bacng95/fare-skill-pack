@@ -7,6 +7,7 @@ description: Chạy verify cho 1 round test case — ghi verify_history atomic, 
 
 **Việc:** chạy 1 round verify cho danh sách TC (1 doc test_case · 1 campaign · 1 task TEST · danh sách id), ghi kết quả + đề xuất chuyển trạng thái task PM.
 **Cú pháp:** `/fare-verify [mã project] [scope: doc_id|task_id|campaign_id] [env: dev|staging|prod?]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-qa-engineer` (chạy skill `fare-test-execution`).
 
 ## Luồng

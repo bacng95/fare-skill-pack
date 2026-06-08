@@ -7,6 +7,7 @@ description: Entry chung cho vai QA — agent route theo việc User nói (viế
 
 **Việc:** kích hoạt vai QA; agent đọc ngữ cảnh project và đề xuất bước tiếp theo theo việc User mô tả.
 **Cú pháp:** `/fare-qa [mã project] [việc cần làm — mô tả tự do]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-qa-engineer`.
 
 ## Luồng

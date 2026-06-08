@@ -7,6 +7,7 @@ description: Chia 1 Function (đã có spec đầy đủ) thành n task implemen
 
 **Việc:** đẩy task chi tiết lên backlog cho 1 function đã có spec.
 **Cú pháp:** `/fare-breakdown [mã project] [id function] [chiến lược?]`
+**Đầu vào người dùng:** $ARGUMENTS
 - `[chiến lược?]` (tùy chọn): `layer` (mặc định) · `slice` (vertical theo feature) · `dependency`.
 **Agent phụ trách:** `fare-project-manager` (chạy skill `fare-task-breakdown`).
 

@@ -7,6 +7,7 @@ description: Kiểm toán một tài liệu đặc tả đã có — tìm điể
 
 **Việc:** soi một spec đã có trên FARE, tìm điểm mù & edge case trước khi nó được dùng để code / test.
 **Cú pháp:** `/fare-audit-spec [mã project] [id hoặc tên tài liệu]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-spec-reviewer` (chạy theo SOP trong file agent đó).
 
 ## Luồng

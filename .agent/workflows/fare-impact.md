@@ -7,6 +7,7 @@ description: TRƯỚC khi sửa 1 symbol — quét blast radius qua FARE code in
 
 **Việc:** quét blast radius của 1 symbol (function/class/method) trước khi dev sửa; phòng tránh "sửa 1 chỗ gãy 10 chỗ".
 **Cú pháp:** `/fare-impact [mã project] [tên symbol] [loại thay đổi?]`
+**Đầu vào người dùng:** $ARGUMENTS
 - `[loại thay đổi?]` (tùy chọn): `signature-change` · `rename` · `behavior-change` · `add-field` · `delete`.
 **Agent phụ trách:** `fare-developer` (chạy skill `fare-impact-analysis`).
 

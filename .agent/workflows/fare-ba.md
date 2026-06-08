@@ -7,6 +7,7 @@ description: Phân tích yêu cầu nghiệp vụ → viết Use Case / User Sto
 
 **Việc:** biến một yêu cầu / tính năng — hoặc một tài liệu yêu cầu nguyên khối — thành đặc tả chuẩn trên FARE.
 **Cú pháp:** `/fare-ba [mã project] [tên tính năng | id tài liệu cần tách]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-business-analyst` (chạy theo SOP trong file agent đó).
 
 ## Luồng

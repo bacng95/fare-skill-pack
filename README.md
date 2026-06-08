@@ -12,7 +12,15 @@ npx fare-skill-pack init
 npx github:bacng95/fare-skill-pack init
 ```
 
-CLI sao chép thư mục `.agent/` vào workspace. Đăng ký MCP server FARE là bước riêng — chạy `npx fare-skill-pack register-mcp` để xem lệnh `claude mcp add` cần thực thi, hoặc tự cấu hình theo tài liệu của Claude Code.
+CLI sao chép `.agent/` (cho Antigravity / Gemini) **và** sinh `.claude/` (cho Claude Code) vào workspace từ cùng một nguồn — `.agent/` là nguồn sự thật, `.claude/` được suy ra:
+
+| Loại | Antigravity đọc | Claude Code đọc |
+|---|---|---|
+| Skills | `.agent/skills/` | `.claude/skills/` |
+| Agents | `.agent/agents/` | `.claude/agents/` (bỏ field `skills:`) |
+| Workflows / lệnh | `.agent/workflows/` | `.claude/commands/` (tên lệnh = tên file) |
+
+Đăng ký MCP server FARE là bước riêng — chạy `npx fare-skill-pack register-mcp` để xem lệnh `claude mcp add` cần thực thi, hoặc tự cấu hình theo tài liệu của Claude Code.
 
 ## Yêu cầu
 
@@ -47,6 +55,19 @@ fare-skill-pack <command> [target]
 | `version` | In version. |
 
 Cả `fare-skill` và `fare-skill-pack` đều khả dụng làm bin name.
+
+## Phát triển (tác giả skill)
+
+Nguồn sự thật là `.agent/`. Khi sửa skill/agent/workflow và muốn **test ngay trên Claude Code** (Claude Code không đọc `.agent/`), sinh `.claude/` tại repo root:
+
+```bash
+npm run sync:claude      # build .claude/ một lần từ .agent/
+npm run dev              # watch — tự build lại mỗi khi .agent/ đổi
+```
+
+Sau đó restart Claude Code hoặc `/mcp reconnect` để nó nạp lại skill/agent/command. `.claude/{skills,agents,commands}` là **generated** (đã .gitignore) — chỉ commit `.agent/`. Cùng bộ chuyển đổi (`bin/lib/build-claude.mjs`) được `init` dùng cho người dùng cuối, nên test ở repo khớp 100% với bản phân phối.
+
+`$ARGUMENTS` là convention chung của cả Antigravity lẫn Claude Code — đặt sẵn trong `.agent/workflows/` để cả hai nền tảng nhận tham số sau slash-command.
 
 ## Agents và workflows
 

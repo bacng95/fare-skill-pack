@@ -7,6 +7,7 @@ description: Xây ma trận truy vết requirement ↔ use_case ↔ user_story �
 
 **Việc:** quét phạm vi User chọn (project / module / 1 doc), xâu chuỗi từ yêu cầu nghiệp vụ tới task/test, liệt kê chỗ thiếu phủ.
 **Cú pháp:** `/fare-trace [mã project] [module|doc id?] [forward|backward?]`
+**Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-business-analyst` (chạy skill `fare-traceability`).
 
 ## Luồng
