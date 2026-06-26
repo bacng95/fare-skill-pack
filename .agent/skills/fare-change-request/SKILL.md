@@ -11,7 +11,7 @@ KHÔNG thuộc skill này: viết spec mới (→ `fare-spec-authoring`); soát 
 
 ## Tiền đề
 - Đã có **Bản đồ ngữ cảnh** (`fare-context-discovery`).
-- Tuân `rules/fare-rules.md`: §2 Confirmation Gate (mọi `update_document`/`patch_document` đều phải xác nhận), §7 Content Fidelity (không tự suy diễn yêu cầu mới), §8 (đọc TƯƠI từ FARE, không dùng file scratch phiên cũ).
+- Tuân `rules/fare-rules.md`: §2 Confirmation Gate (mọi `update_document`/`edit_document` đều phải xác nhận), §7 Content Fidelity (không tự suy diễn yêu cầu mới), §8 (đọc TƯƠI từ FARE, không dùng file scratch phiên cũ).
 
 ## Mô hình version FARE
 - Doc có **lịch sử version**: `fare://documents/{id}/versions` → metadata (ai publish, khi nào, status).
@@ -33,7 +33,7 @@ KHÔNG thuộc skill này: viết spec mới (→ `fare-spec-authoring`); soát 
 ### Bước 2 — Đọc bản hiện tại + bản đã duyệt
 - `read_document(id)` — bản hiện tại (paginated, đọc hết).
 - Xem `fare://documents/{id}/versions` → tìm version `approved` mới nhất. `read_document(id, version=N)` để có baseline đối chiếu.
-- Với structured (`use_case` / `user_story` / `glossary`): so sánh JSON. Với richtext: dùng `mode="blocks"` để có ID block ổn định cho patch sau.
+- Với structured (`user_story` / `glossary`): so sánh JSON. Với richtext: dùng `mode="blocks"` để có ID block ổn định cho patch sau.
 
 ### Bước 3 — Đánh giá tác động (downstream)
 Trước khi sửa, liệt kê những gì có thể bị ảnh hưởng — User cần thấy để chốt scope:
@@ -42,8 +42,8 @@ Trước khi sửa, liệt kê những gì có thể bị ảnh hưởng — Use
 |---|---|
 | Use case / user story liên quan | `search_rag(<FR id hoặc tên function>)` + `list_documents(query=...)` |
 | Test case phủ AC bị đổi | `list_test_cases(projectCode, document_id=<spec id>)` |
-| Task đã / đang code spec này | `list_tasks(projectCode, module_id=<của spec>)` — quét `description` cho URI |
-| Epic chứa task của spec | Đối chiếu `task.epic_id` của các task ở dòng trên → `query_epics(epicId)` từng cái. Báo: epic nào bị ảnh hưởng (có thể trễ due, cần đổi status `at_risk`, owner cần biết). |
+| Task đã / đang code spec này | `list_tasks(projectCode, plan_item_id=<của spec>)` — quét `description` cho URI |
+| Epic (cấp giữa) chứa story của spec | `list_plan_items(projectCode)` → tìm epic cha của story (`plan_item_id` của spec, đối chiếu `parent_id`). Muốn xem mọi task dưới epic: `list_tasks(projectCode, plan_item_ids=[<epicId>], include_descendants=true)`. Báo: nhánh epic nào bị ảnh hưởng. |
 | Doc kỹ thuật (api_doc / erd) tham chiếu | `search_rag(<tên thực thể/endpoint>)` |
 | Code (nếu repo có index code) | `code_query(<concept>)`, `code_impact(<symbol>)` |
 
@@ -55,8 +55,8 @@ Báo cáo `## Impact Assessment` — nhóm theo mức rủi ro 🟥/🟧/🟨 (t
 - User chốt → mới chuyển sang Bước 5. Cấm gộp impact + diff + execute trong cùng 1 lượt (§2 cấm "gộp quyết định").
 
 ### Bước 5 — Thực thi sửa
-- **Richtext (`brd`/`srs`/`prd`/`requirement`/...):** ưu tiên `patch_document(id, ops=[...])` block-level. Tránh `update_document` ghi đè cả tài liệu (rule §4 Patch thay vì Rewrite + tránh phá CRDT khi có người collab).
-- **Structured (`use_case`/`user_story`/`glossary`):** `read_document` → sửa JSON → `update_document(id, content=<FULL JSON>)`. KHÔNG patch.
+- **Richtext (`brd`/`srs`/`prd`/`requirement`/...):** ưu tiên `edit_document(id, ops=[...])` block-level (sửa NỘI DUNG). Tránh `edit_document(replace_all=...)` ghi đè cả tài liệu (rule §4 Patch thay vì Rewrite + tránh phá CRDT khi có người collab). `update_document` chỉ dùng cho METADATA/vị trí (title/status/move), KHÔNG sửa nội dung.
+- **Structured (`user_story`/`glossary`):** `read_document` lấy bản hiện tại → sửa JSON → `edit_document(id, replace_all=<FULL JSON>)`. KHÔNG patch block lẻ.
 - **Ghi change log** vào doc:
   - Richtext: thêm 1 block "Change Log" cuối doc, format:
     ```
@@ -72,7 +72,7 @@ Báo cáo `## Impact Assessment` — nhóm theo mức rủi ro 🟥/🟧/🟨 (t
 - UC/US bị đổi flows/AC → đề xuất `fare-spec-reviewer` soát lại blind spot.
 - Test case bị ảnh hưởng → đề xuất bàn giao QA cập nhật (khi vai QA có).
 - Task downstream `DONE` mà spec đổi sau khi code → đề xuất tạo task BUG / re-verify (NHƯNG theo rule §5: chỉ tạo BUG sau khi User xác nhận).
-- **Epic bị ảnh hưởng** → bàn giao PM `/fare-epic`: cân nhắc đổi `status="at_risk"` nếu deadline epic bị đe dọa; thông báo owner epic; cập nhật due_date nếu cần.
+- **Nhánh epic bị ảnh hưởng** → nếu thay đổi đụng nhiều story dưới cùng epic → bàn giao PM `/fare-pm` xem lại phạm vi / month plan của nhánh đó (`list_tasks(plan_item_ids=[<epicId>], include_descendants=true)` để soát task chịu ảnh hưởng).
 
 ## Anti-patterns
 - ❌ Sửa nội dung không có source/lý do trong description.
@@ -85,8 +85,8 @@ Báo cáo `## Impact Assessment` — nhóm theo mức rủi ro 🟥/🟧/🟨 (t
 ## Tự kiểm
 - [ ] Lý do & nguồn yêu cầu thay đổi đã được User cung cấp & ghi vào change log.
 - [ ] Đã đọc cả bản hiện tại VÀ bản `approved` mới nhất từ FARE (đọc tươi, không file local).
-- [ ] Impact assessment đã liệt kê đầy đủ downstream theo 6 nhóm (UC/US, test, task, doc kỹ thuật, code, **epic**), có mức rủi ro.
-- [ ] Diff đã được User chốt TRƯỚC khi `patch_document` / `update_document` (§2).
-- [ ] Richtext dùng `patch_document`; structured gửi FULL JSON qua `update_document`.
+- [ ] Impact assessment đã liệt kê đầy đủ downstream theo 6 nhóm (UC/US, test, task, doc kỹ thuật, code, **nhánh epic chứa story của spec**), có mức rủi ro.
+- [ ] Diff đã được User chốt TRƯỚC khi `edit_document` / `update_document` (§2).
+- [ ] Richtext dùng `edit_document` (block ops); structured gửi FULL JSON qua `edit_document(replace_all)`.
 - [ ] Change log đã ghi (block hoặc comment) — không sửa "lặng".
 - [ ] `status="draft"` hoặc `in_review` — KHÔNG `approved`. Việc publish dành cho User.

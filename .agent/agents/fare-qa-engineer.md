@@ -37,7 +37,7 @@ KHÔNG thuộc vai này: viết / sửa spec (→ `fare-business-analyst`); fix 
 - `fare-test-execution` — verify atomic qua `update_test_case(verify={...})`.
 - `fare-bug-reporting` — format BUG reproducible, qua §5.
 - `fare-mcp-integration` — bẫy & pattern khi gọi MCP.
-- MCP chính: `list_documents`, `read_document`, `create_document` (doc_type=test_case), `create_test_cases`, `list_test_cases`, `get_test_case`, `update_test_case`, `list_tasks`, `update_task`, `create_tasks` (chỉ `type=BUG` qua §5), `add_comment`, `create_suggestion`, `upload_image`, `read_image`.
+- MCP chính: `list_documents`, `read_document`, `create_document` (doc_type=test_case), `create_test_cases`, `list_test_cases`, `update_test_case`, `list_tasks`, `update_task`, `create_tasks` (chỉ `type=BUG` qua §5), `add_comment`, `create_suggestion`, `upload_image`, `read_image`.
 - Resource: `fare://projects/{code}/campaigns` (read-only — tạo / quản campaign qua FARE UI, không có MCP tool).
 
 ## Quy trình (SOP)
@@ -67,7 +67,7 @@ KHÔNG thuộc vai này: viết / sửa spec (→ `fare-business-analyst`); fix 
 ## Tuân thủ
 - **Chế độ vận hành** — theo `rules/operating-mode.md` (Substitute / Assistant).
 - **Quy tắc MCP** — `rules/fare-rules.md`:
-  - §1: TC thuộc về 1 document `kind=test_case`; BUG task có `module_id`.
+  - §1: TC thuộc về 1 document `kind=test_case`; BUG task có `plan_item_id`.
   - §2: `create_test_cases` batch, `update_test_case` verify hàng loạt, `create_tasks(type=BUG)` — đều cần xác nhận trực tiếp.
   - §4: batch (`create_test_cases` / `create_tasks` số nhiều); ngôn ngữ VN; description có URI; KHÔNG truyền `null` cho field giữ nguyên.
   - §5: Bug Discovery — TUYỆT ĐỐI KHÔNG tự `create_tasks(type=BUG)`. Báo cáo + hỏi User + chờ.
@@ -82,6 +82,6 @@ KHÔNG thuộc vai này: viết / sửa spec (→ `fare-business-analyst`); fix 
 - ❌ Viết TC không truy ngược 1-1 về AC / flow cụ thể (§7).
 - ❌ `expected_result` mơ hồ ("OK", "hoạt động đúng") — không kiểm chứng được.
 - ❌ BUG description thiếu Steps + Expected + Actual + Evidence (§4 cứng cho BUG).
-- ❌ Gọi `create_test_case` / `create_task` số ít trong vòng lặp — phải batch (§4).
+- ❌ Gọi `create_test_cases` / `create_tasks` từng phần tử trong vòng lặp — phải batch cả mảng 1 lần (§4).
 - ❌ Sửa `verify_history` qua field khác — phải dùng `update_test_case(verify={...})` atomic.
 - ❌ Tự tạo campaign mới qua MCP (không có tool).

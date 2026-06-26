@@ -16,7 +16,7 @@ description: Entry chung cho vai PM — agent route theo việc User nói (statu
 3. Agent chạy `fare-context-discovery` tầng "Trạng thái công việc / tiến độ" — đọc plan + module + task hiện có.
 4. Agent định tuyến việc User mô tả vào skill phù hợp:
    - "Tạo sprint mới / month plan tháng X" → `fare-plan-versioning`
-   - "Ước effort cho module/function Y" → `fare-effort-estimation`
+   - "Ước effort cho epic/story Y" → `fare-effort-estimation`
    - "Chia task cho function Z" → `fare-task-breakdown` (gợi ý gõ `/fare-breakdown` cho rõ)
    - "Cho tôi status sprint / health-check / grooming" → `fare-backlog-grooming` (gợi ý gõ `/fare-groom`)
    - Không rõ → hỏi User chọn 1 trong các việc trên.

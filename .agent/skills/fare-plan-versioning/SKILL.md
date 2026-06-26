@@ -12,14 +12,14 @@ Dùng khi: PM cần tạo / cập nhật month plan cho sprint mới, hoặc c�
 ```
 Project (1)
 ├── Master Plan (1, auto-created với project, type="master", year-scope)
-│   └── Version (n) — DRAFT / PUBLIC. Mỗi version là 1 snapshot cây Module→Submodule→Function.
+│   └── Version (n) — DRAFT / PUBLIC. Mỗi version là 1 snapshot cây plan item theme→epic→story.
 └── Month Plan (n, PM tự tạo qua upsert_plan, type="month")
     └── Version (n) — seed từ master PUBLIC version mới nhất khi tạo
 ```
 
 **Sự thật cứng:**
 - **Master plan = singleton**, auto-tạo với project, KHÔNG sửa qua `upsert_plan` (chỉ qua giao diện FARE tạo project ban đầu). PM không động vào master qua MCP.
-- **Master version PUBLIC** = nguồn cấu trúc Module→Submodule→Function cho cả project. Khi PM muốn thay đổi cây module → BA chạy `/fare-plan` (`fare-plan-breakdown`) tạo / sửa module trên master draft → User publish master để có version PUBLIC mới.
+- **Master version PUBLIC** = nguồn cấu trúc cây plan item theme→epic→story cho cả project. Khi PM muốn thay đổi cây → BA chạy `/fare-plan` (`fare-plan-breakdown`) tạo / sửa plan item trên master draft → User publish master để có version PUBLIC mới.
 - **Month plan** = container 1 sprint / 1 chu kỳ thực thi. Tạo qua `upsert_plan(project_code, month, year)` — FARE auto-tạo 1 DRAFT version và **seed cây từ master PUBLIC mới nhất**. Sửa cây trong DRAFT month plan KHÔNG ảnh hưởng master.
 - **Version có status `DRAFT` hoặc `PUBLIC`** (FARE tự đặt). Agent chỉ chuẩn bị DRAFT; publish → PUBLIC là quyết định User.
 - `task.plan_month_id` (optional) gắn task vào 1 month plan để track theo sprint.
@@ -28,7 +28,7 @@ Project (1)
 | Tình huống | Hành động |
 |---|---|
 | Sprint mới (đầu tháng / đầu cycle) | Tạo month plan mới → seed cây từ master PUBLIC → tạo task gắn `plan_month_id` |
-| Cây module có function mới giữa sprint | Bàn BA chạy `/fare-plan` cập nhật master → User publish master → sửa month plan nếu cần snapshot lại |
+| Cây plan item có story mới giữa sprint | Bàn BA chạy `/fare-plan` cập nhật master → User publish master → sửa month plan nếu cần snapshot lại |
 | Đổi metadata month plan (đổi name, dates) | `upsert_plan(plan_id=..., ...)` — chỉ field thay đổi |
 | Đổi `type` / `project_id` của plan | **KHÔNG được** — bất biến sau khi tạo |
 | Sửa master plan | KHÔNG qua MCP — báo User dùng giao diện FARE |
@@ -44,13 +44,13 @@ Project (1)
    start_at=2026-05-01, end_at=2026-05-31
    ```
 4. **Tạo.** `upsert_plan(project_code, month=5, year=2026, name=..., start_at=..., end_at=...)`. FARE trả `plan_id` + auto-create DRAFT version.
-5. **Verify.** `get_plan(plan_id, include=["versions"])` → confirm có DRAFT version + cây seed.
+5. **Verify.** `list_plans(id=plan_id, include=["versions"])` → confirm có DRAFT version + cây seed.
 6. **Bàn giao.** Báo `plan_id` & `plan_version_id` để bước task breakdown gắn `plan_month_id` đúng.
 
 ## Quy trình cập nhật month plan đã có
 
 - Đổi metadata (name / dates / description): `upsert_plan(plan_id=..., name=..., end_at=...)` — CHỈ field thay đổi (§4).
-- Sửa cây module trong DRAFT version: KHÔNG có MCP trực tiếp — phải qua BA `/fare-plan` (sửa master) hoặc giao diện FARE. Báo User.
+- Sửa cây plan item trong DRAFT version: KHÔNG có MCP trực tiếp — phải qua BA `/fare-plan` (sửa master) hoặc giao diện FARE. Báo User.
 - Publish DRAFT → PUBLIC: **KHÔNG có MCP trực tiếp**; là quyết định người thật + thao tác trên FARE UI. Agent KHÔNG tự publish (rule §7 — "approve" / "publish" là việc của con người).
 
 ## Anti-patterns
@@ -67,5 +67,5 @@ Project (1)
 - [ ] Đã `list_plans` kiểm tra master + month plan hiện có TRƯỚC khi tạo (tránh trùng).
 - [ ] Master có ít nhất 1 PUBLIC version trước khi tạo month plan (nếu không, đã báo User).
 - [ ] Tham số `month`, `year`, `name` đã được User chốt.
-- [ ] Sau `upsert_plan` đã `get_plan(include=["versions"])` verify DRAFT version có sẵn cây seed.
+- [ ] Sau `upsert_plan` đã `list_plans(id=<plan_id>, include=["versions"])` verify DRAFT version có sẵn cây seed.
 - [ ] KHÔNG tự publish version. Việc publish bàn giao User thao tác trên FARE UI.

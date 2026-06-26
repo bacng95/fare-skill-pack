@@ -40,7 +40,7 @@ Hỏi & CHỜ:
 
 `list_test_cases(projectCode, document_id?, verify_status="pending", limit=50, include_stats=true)`:
 - Có thống kê tổng (total/passed/failed/pending) trước khi chạy → User thấy quy mô.
-- Lấy từng TC chi tiết: `get_test_case(testCaseId)` để có `steps[]`, `preconditions`, `expected_result`.
+- Lấy từng TC chi tiết: `list_test_cases(id=testCaseId)` để có `steps[]`, `preconditions`, `expected_result`.
 
 ## Bước 2 — Verify từng TC (hoặc batch theo round)
 
@@ -111,17 +111,17 @@ KHÔNG tự chuyển task sang DONE chỉ vì "round này pass" — phải đế
 
 ## Bước 5 — Báo cáo & bàn giao
 
-Báo cáo round (kèm breakdown theo epic nếu task verify có `epic_id`):
+Báo cáo round (kèm breakdown theo epic — gom task verify theo epic cha của story `plan_item_id`):
 ```
 ## Round verify — {phạm vi} — {yyyy-mm-dd HH:mm}
 Tổng: 12 TC | passed 9 | failed 2 | blocked 1
 
-### Theo Epic (nếu task có epic_id — tra qua `task.epic_id` → `query_epics(epicId)`)
+### Theo Epic (tra cây WBS: `plan_item_id` của task → story → epic cha qua `list_plan_items`, lọc `type="epic"`)
 | Epic | Pass | Fail | Block | Trạng thái |
 |---|---|---|---|---|
-| "Onboarding Q2 2026" (id=5) | 6 | 1 | 0 | 🟧 — 1 TC fail cần fix trước due 2026-06-30 |
-| "Payment v3" (id=8) | 3 | 1 | 1 | 🟧 — fix + clear blocker môi trường |
-| (không epic) | 0 | 0 | 0 | — |
+| "Onboarding" (E5) | 6 | 1 | 0 | 🟧 — 1 TC fail cần fix |
+| "Payment v3" (E8) | 3 | 1 | 1 | 🟧 — fix + clear blocker môi trường |
+| (ngoài cây) | 0 | 0 | 0 | — |
 
 ### Failed (2)
 - TC-102 [Negative] ... → actual "...". Đề xuất tạo BUG (xem fare-bug-reporting).

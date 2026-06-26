@@ -24,7 +24,7 @@ KHÔNG thuộc skill này: tự code (Dev USER); chạy verify chính thức (�
 ### Bước 1 — Đọc lại DoD & TC
 
 1. `list_tasks(id=<task id>)` lấy lại description (có Definition of Done).
-2. Liệt kê `test_case_ids` linked → `get_test_case` từng cái nếu nhiều, hoặc `list_test_cases(document_id=...)` nếu cùng doc.
+2. Liệt kê `test_case_ids` linked → `list_test_cases(id=...)` từng cái nếu nhiều, hoặc `list_test_cases(document_id=...)` nếu cùng doc.
 3. Đọc lại comment scope đã viết khi `IN_PROGRESS` (Bước 4 của `fare-task-pickup`).
 
 ### Bước 2 — Self-checklist đối chiếu

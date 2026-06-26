@@ -6,6 +6,7 @@ import { cp, rm, mkdir, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const src = resolve(root, '.agent');
@@ -15,6 +16,14 @@ try {
     await stat(src);
 } catch {
     console.error(`[prepack] FAIL: source ${src} not found.`);
+    process.exit(1);
+}
+
+// Gate: không đóng gói nếu skill còn tham chiếu tool MCP FARE đã bị gỡ.
+try {
+    execFileSync('node', [resolve(root, 'bin', 'check-tools.mjs')], { stdio: 'inherit' });
+} catch {
+    console.error('[prepack] FAIL: skill còn tham chiếu tool MCP FARE đã bị gỡ (xem trên).');
     process.exit(1);
 }
 

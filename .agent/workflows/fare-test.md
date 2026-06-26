@@ -18,7 +18,7 @@ description: Viết test case từ spec đã có (US/UC/SRS) — map AC → n TC
 
 ## Tiền đề CỨNG
 - Spec mục tiêu PHẢI có AC (Given-When-Then) hoặc flows chi tiết. Spec mỏng → agent DỪNG, bàn giao BA `/fare-ba` bổ sung.
-- Mọi TC gắn vào 1 doc `test_case` thuộc đúng `module_id` của function (rule §1).
+- Mọi TC gắn vào 1 doc `test_case` thuộc đúng `plan_item_id` của function (rule §1).
 
 ## Bàn giao
 - TC tạo xong → bàn giao **executor** chạy `/fare-verify`.

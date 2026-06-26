@@ -44,21 +44,24 @@ Mỗi câu sau khi làm sạch phải **truy ngược 1:1** về bản nháp g�
    > Script lỗi / HTML quá dị → fallback làm tay theo `references/{loại}.md`. Báo User.
 3. **Agent review + phần JUDGMENT** (script KHÔNG làm — cần hiểu ngữ cảnh):
    - Đối chiếu output với khuôn `references/{loại}.md`: đúng thứ tự mục, nhãn chuẩn. Sửa chỗ script đặt sai mục (vd nhãn section nguồn dị).
-   - **Cross-ref**: số mục → `{số} {tên}` (tra checklist heading / `list_documents`); không tra được → `⚠️ chưa phân giải`.
+   - **Cross-ref**: số mục → `{số} {tên}` (tra checklist heading / `list_documents`); không tra được → giữ `{số}` như nguồn, **báo User** (KHÔNG nhét `⚠️ chưa phân giải` vào doc).
    - **Nhãn "- DONE"** trong heading: bỏ (trạng thái nằm trên FARE).
-   - **Lỗi nội dung nguồn** (typo, copy-paste sai, `<s>` field bị bỏ, `<mark>` chưa chốt): ghi `⚠️` vào sổ, KHÔNG sửa thầm (§7).
+   - **Markup biên tập & lỗi nội dung nguồn** (comment/highlight/`<s>`; typo, copy-paste sai): **báo User NGOÀI LUỒNG, KHÔNG nhét `⚠️`/ghi chú vào thân doc** (= tự thêm chữ không có ở nguồn → adulterate, vi phạm §7). Script đã gom markup biên tập ra **stderr** — đọc để relay. KHÔNG sửa thầm. `<s>` giữ `~~..~~` (formatting nguồn).
    - Mọi câu truy ngược 1:1 về nguồn — không rơi nội dung.
-4. **Ghi đè file** bằng bản sạch. Báo User: file nào, sổ `⚠️`.
+4. **Ghi đè file** bằng bản sạch. Báo User ngoài luồng: file nào + **danh sách điểm biên tập/nghi vấn** (gộp từ stderr script + rà của agent) — không nằm trong doc.
 5. **DỪNG** — chờ User review. Đẩy FARE là bước sau, do User yêu cầu.
 
 ## Tự kiểm
 - [ ] Đã chạy `scripts/html_to_md.py` cho phần cú pháp (hoặc fallback tay nếu script lỗi, có báo User).
 - [ ] Đã chọn đúng loại; output khớp khuôn trong `references/{loại}.md` (heading, thứ tự mục, nhãn).
+- [ ] **Trình bày khớp "Quy tắc trình bày" + ví dụ mẫu của khuôn**: field bullet đã `**đậm tên** *(marker)*: spec`; bước có nhiều nhóm field đã **lồng** (nhóm = bullet L1, field = bullet L2 — KHÔNG để nhãn nhóm là paragraph ngang cấp "Bước N").
+- [ ] **🔴 MỖI `**Bước N:**` LÀ ĐOẠN RIÊNG, cách nhau DÒNG TRỐNG — KHÔNG dính chung 1 dòng** (lỗi tái phát NHẤT). Sau khi đẩy FARE: `read_document` đọc lại, xác nhận từng Bước tách đoạn; dính → `edit_document` chèn dòng trống. Đúng kể cả khi gõ tay / đẩy MCP-only (đừng ỷ script).
 - [ ] Tên file & thư mục đúng **Quy chuẩn đặt tên**; nhãn "- DONE" đã bỏ khỏi heading.
 - [ ] Không còn `<table>` / `data-id` / `style` / marker `⟨INDENT⟩` / markup HTML rác.
 - [ ] `<img>` → `![](fare://files/..)` giữ ref, KHÔNG chép alt AI; `<s>` giữ `~~..~~`.
 - [ ] Mọi câu truy ngược 1:1 về bản gốc — không thêm, không bớt.
+- [ ] **Field gộp từ nhiều sub-bullet nguồn → đủ mọi ý con** (đếm sub-bullet nguồn = số mệnh đề `;` trong dòng); KHÔNG rớt rule (vd điều kiện enable "chỉ chọn khi đã chọn …").
 - [ ] Field nguồn để trống vẫn để trống (không tự điền).
-- [ ] Tham chiếu chéo ở dạng `{số} {tên}` — không còn số mục trần vô nghĩa; số nào không tra được tên thì có `⚠️`.
-- [ ] Lỗi nội dung (nếu có) chỉ được `⚠️` + báo, KHÔNG sửa.
+- [ ] Tham chiếu chéo ở dạng `{số} {tên}` — không còn số mục trần vô nghĩa; số không tra được → giữ `{số}`, báo User (KHÔNG `⚠️` trong doc).
+- [ ] **Thân doc SẠCH**: không còn `⚠️`/ghi chú của agent — chỉ nội dung + formatting nguồn (`<s>`→`~~..~~` được giữ). Markup biên tập (comment/highlight) + lỗi nội dung → **báo User ngoài luồng**, KHÔNG nhét vào doc, KHÔNG sửa thầm.
 - [ ] **Giữ nguyên dòng provenance** ở đầu file — không xóa khi dọn form.

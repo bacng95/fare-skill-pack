@@ -11,7 +11,7 @@ KHÔNG thuộc skill này: tự fix code (→ `fare-developer` `/fare-dev`); s�
 
 ## Tiền đề
 - Đã có **bằng chứng cụ thể**: TC fail với `actual_result` rõ, hoặc reproduction tay có steps + expected.
-- Tuân `rules/fare-rules.md`: §5 (Bug Discovery — KHÔNG tự create BUG, phải User chốt), §1 (BUG task vẫn cần `module_id`), §4 (batching, VN, URI doc), §2 Confirmation Gate.
+- Tuân `rules/fare-rules.md`: §5 (Bug Discovery — KHÔNG tự create BUG, phải User chốt), §1 (BUG task vẫn cần `plan_item_id`), §4 (batching, VN, URI doc), §2 Confirmation Gate.
 
 ## ⚠️ Rule §5 — KHÔNG được bỏ qua
 
@@ -114,7 +114,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 1. **Lấy bối cảnh fail.** Từ `/fare-verify`: TC id, `actual_result`, `note` (env). Hoặc QA quan sát tay.
 2. **Suy luận sơ bộ** (không quá xa — chỉ trên dữ liệu có):
    - Root cause: hệ thống nào lỗi (BE / FE / DB / 3rd party / config)?
-   - Module/function ảnh hưởng: tra qua `list_tasks` / `code_query` nếu có index code.
+   - Plan item (epic/story) / thành phần ảnh hưởng: tra qua `list_tasks` / `code_query` nếu có index code.
    - Có bug tương tự đang mở? `list_tasks(projectCode, type="BUG", search=...)` — tránh tạo trùng.
 3. **Soạn bản nháp BUG** đầy đủ Steps/Expected/Actual/Evidence/Tham chiếu/Severity/Priority + **`bug_origin` + `linked_task_id`** (nếu INTRINSIC).
 4. **Báo cáo Markdown + HỎI User** (rule §5):
@@ -124,7 +124,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 
    → Đề xuất tạo BUG task title "[BUG] ..." trên project FARE
      bug_origin=INTRINSIC, linked_task_id=87 (task TEST gốc),
-     severity=major, priority=high, module_id=<function id>.
+     severity=major, priority=high, plan_item_id=<function id>.
      (INTRINSIC sẽ chặn task #87 chuyển DONE đến khi bug đóng.)
 
    Tạo không?
@@ -155,7 +155,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 - ❌ Đánh đồng severity với priority.
 - ❌ Tạo BUG khi root cause là TC viết sai (phải bàn giao `fare-test-authoring`).
 - ❌ Tạo BUG khi behavior chưa lặp lại được — chờ reproduce trước.
-- ❌ Gọi `create_task` (số ít) — phải `create_tasks` batch (§4) kể cả 1 bug.
+- ❌ Tạo BUG bằng vòng lặp từng cái — phải `create_tasks` batch (§4) kể cả 1 bug (không có biến thể số ít).
 - ❌ TC fail mà tạo bug EXTRINSIC (hoặc quên `linked_task_id`) → bug không chặn task cha, task cha vẫn DONE được dù feature lỗi. TC fail = INTRINSIC.
 - ❌ Tạo INTRINSIC mà thiếu `linked_task_id` → lỗi validation backend.
 - ❌ Đoán `bug_origin` khi không chắc — hỏi User.
@@ -169,6 +169,6 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 - [ ] Title dạng `[BUG] {hiện tượng cụ thể} — {nơi}`.
 - [ ] Phân biệt severity ↔ priority — không gán giống nhau cơ học.
 - [ ] Đã xác định `bug_origin`: TC fail → INTRINSIC + `linked_task_id` task cha; bug độc lập → EXTRINSIC. Không chắc đã hỏi User.
-- [ ] BUG có `module_id` của function chứa bug (§1).
+- [ ] BUG có `plan_item_id` của function chứa bug (§1).
 - [ ] Sau khi tạo BUG → đã cập nhật TC fail với `linked_task_id=<bug id>` (truy nguồn 2 chiều).
 - [ ] Trường hợp KHÔNG nên tạo BUG (TC viết sai / spec mơ hồ / không reproduce / trùng) → đã chuyển sang hành động đúng.

@@ -13,11 +13,11 @@ File này định nghĩa các quy tắc **bất khả xâm phạm** (Non-negotia
 
 ## 1. 🏗️ Hierarchy Strictness (Quy tắc Phân cấp)
 Hệ thống FARE yêu cầu phân cấp dữ liệu chặt chẽ.
-- **Quy tắc 3 cấp độ:** Luôn duy trì kiến trúc `Root Module` > `Submodule` > `Function`. Tuyệt đối không tạo Function nằm trực tiếp dưới Root.
+- **Quy tắc 3 cấp độ:** Luôn duy trì kiến trúc cây plan item `theme` › `epic` › `story`. Tuyệt đối không tạo story nằm trực tiếp dưới root.
 - **Không có dữ liệu mồ côi:** 
-  - MỌI `Task` phải có `module_id`.
+  - MỌI `Task` phải có `plan_item_id` (id của một plan item, thường là story cấp lá).
   - MỌI `Test Case` phải thuộc về một `document_id` (loại test_case).
-  - MỌI `Document` kỹ thuật (API, ERD, Use Case, User Story) phải gắn với `module_id` của cấp Function.
+  - MỌI `Document` kỹ thuật (API, ERD, Use Case, User Story) phải gắn với `plan_item_id` của story (cấp lá).
 
 ## 2. 🛡️ Cổng xác nhận & Thay đổi An toàn (Confirmation Gate)
 
@@ -27,18 +27,18 @@ Agent KHÔNG được tự ý thực thi hành động quan trọng / khó hoàn
 3. Cấm gộp nhiều quyết định quan trọng vào một lượt rồi thực thi luôn — mỗi quyết định một xác nhận.
 
 **Các hành động BẮT BUỘC xác nhận trước:**
-- **Xóa:** `delete_task`, `delete_document`, `delete_module` — tuyệt đối không gọi nếu User chưa nói rõ "xóa …".
-- **Ghi đè nội dung** tài liệu / test case đã có: `update_document`, `patch_document`, `update_test_case` (khi sửa nội dung). Phát hiện sai sót → ưu tiên `add_comment` / `create_suggestion` báo cáo, KHÔNG âm thầm sửa.
+- **Xóa:** `delete_task`, `delete_document`, `delete_plan_item` — tuyệt đối không gọi nếu User chưa nói rõ "xóa …".
+- **Ghi đè nội dung** tài liệu / test case đã có: `update_document`, `edit_document`, `update_test_case` (khi sửa nội dung). Phát hiện sai sót → ưu tiên `add_comment` / `create_suggestion` báo cáo, KHÔNG âm thầm sửa.
 - **Di chuyển tài liệu** sang folder / scope / module khác — đây là quyết định vị trí, KHÔNG tự đoán đích (xem skill `fare-mcp-integration`).
 - **Đổi trạng thái task**, đặc biệt khi chuyển sang `DONE` — xem mục 6.
 - **Tạo dữ liệu hàng loạt** lên FARE: `create_tasks`, `create_test_cases`, hoặc nhiều `create_document` liên tiếp.
 - **Tạo mới Feature / Requirement** — phải qua Socratic Gate (mục 5).
-- **Đổi cấu trúc module:** `add_module` / `update_module` thay đổi cây phân cấp hoặc attribute.
+- **Đổi cấu trúc cây plan item:** `add_plan_item` / `update_plan_item` (đổi `parent_id` = di chuyển) thay đổi cây phân cấp hoặc attribute.
 
 Ngoại lệ: nếu User đã phát lệnh trực tiếp đúng hành động đó ("xóa task FCORE-12 đi") thì lệnh đó CHÍNH LÀ xác nhận — không cần hỏi lại.
 
 ## 3. 🧠 Context First (Ngữ cảnh đi đầu)
-- **Không suy đoán (No Guessing):** Không bao giờ tự bịa ra `projectCode`, `module_id`, `task_id`, `status_id` hay `document_id`. Phải luôn dùng các công cụ List (`list_projects`, `list_modules`, `list_tasks`, `list_documents`) hoặc `search_rag` (cho tìm kiếm ngữ nghĩa) để lấy ID chính xác từ cơ sở dữ liệu.
+- **Không suy đoán (No Guessing):** Không bao giờ tự bịa ra `projectCode`, `plan_item_id`, `task_id`, `status_id` hay `document_id`. Phải luôn dùng các công cụ List (`list_projects`, `list_plan_items`, `list_tasks`, `list_documents`) hoặc `search_rag` (cho tìm kiếm ngữ nghĩa) để lấy ID chính xác từ cơ sở dữ liệu.
 - **Đọc trước khi làm:** Khi được giao một Task ID, việc đầu tiên là phải gọi `list_tasks(id=<task id hoặc code>)` để lấy chi tiết task, đọc description để lấy URI các tài liệu liên quan, sau đó dùng `read_document` để nạp kiến thức trước khi bắt đầu viết code hoặc test.
 - **Đọc trạng thái hiện tại trước khi GHI:** trước khi `create_document` / `update_document` / tạo folder, phải đọc `fare://projects/{code}/knowledge-tree` để biết cấu trúc folder + tài liệu đang có. Tái dùng folder đã tồn tại (lấy đúng `id`) — KHÔNG tạo folder trùng tên/trùng mục đích. Tuyệt đối không create/update "mù" khi chưa nắm trạng thái đích.
 
@@ -46,10 +46,10 @@ Ngoại lệ: nếu User đã phát lệnh trực tiếp đúng hành động đ
 - **Batching là bắt buộc:** LUÔN sử dụng `create_tasks` (truyền mảng `tasks`) — kể cả khi chỉ tạo 1 task. Tương tự, dùng `create_test_cases` (số nhiều) cho mọi tình huống tạo test case.
 - **Đổi status — `meta_status` trước:** mặc định dùng `update_task(meta_status=...)` với `meta_status ∈ {TODO, IN_PROGRESS, VERIFYING, DONE}` — chạy được mọi project, KHÔNG cần lookup. Chỉ khi project có workflow tùy biến (gọi `list_projects(id=<code>, include_task_statuses=true)` thấy mảng `task_statuses` non-empty) mới dùng `status_id` lấy ID từ mảng đó. Tuyệt đối KHÔNG hard-code số `status_id`.
 - **Tìm document:** dùng `list_documents` với tham số `query` để lọc theo từ khóa tiêu đề; dùng `search_rag` cho tìm kiếm ngữ nghĩa theo nội dung.
-- **Không truyền `null` cho optional param:** field không đổi thì **BỎ HẲN** khỏi payload. Schema MCP từ chối `null` / `""` / `0` cho field số (`folder_id`, `module_id`, `parent_id`…) → lỗi `-32602 Input validation error`. Bỏ field = giữ nguyên giá trị cũ; truyền `null` để "giữ nguyên" là SAI và sẽ fail.
-- **Tuân thủ Format JSON:** Khi tạo Document dạng cấu trúc (`api_doc`, `erd`, `use_case`, `user_story`, `diagram`, `test_case`), bắt buộc truyền Content dưới định dạng JSON hợp lệ theo đúng Document Schema (xem mô tả tool). Markdown chỉ dành cho `doc_type="richtext"`.
-- **Patch thay vì Rewrite:** Với richtext, ưu tiên `patch_document` (block-level ops) thay vì `update_document` để không ghi đè cả tài liệu và bảo toàn keystroke đồng thời (CRDT).
-- **Attribute IDs:** Khi thêm/sửa Module, không truyền giá trị 1-5 bừa bãi cho `complexity`, `scope`, `clarity`. Bắt buộc phải truyền **ID thực tế** của Attribute (Complexity IDs 1-5, Volume IDs 6-10, Clarity IDs 11-15).
+- **Không truyền `null` cho optional param:** field không đổi thì **BỎ HẲN** khỏi payload. Schema MCP từ chối `null` / `""` / `0` cho field số (`folder_id`, `plan_item_id`, `parent_id`…) → lỗi `-32602 Input validation error`. Bỏ field = giữ nguyên giá trị cũ; truyền `null` để "giữ nguyên" là SAI và sẽ fail.
+- **Tuân thủ Format JSON:** Khi tạo Document dạng cấu trúc (`api_doc`, `erd`, `user_story`, `diagram`, `test_case`), bắt buộc truyền Content dưới định dạng JSON hợp lệ theo đúng Document Schema (xem mô tả tool). Markdown chỉ dành cho `doc_type="richtext"`.
+- **Patch thay vì Rewrite:** Với richtext, ưu tiên `edit_document` (block-level ops) thay vì `update_document` để không ghi đè cả tài liệu và bảo toàn keystroke đồng thời (CRDT).
+- **Attribute IDs:** Khi thêm/sửa plan item cấp story, không truyền giá trị 1-5 bừa bãi cho `complexity`, `scope`, `clarity`. Bắt buộc phải truyền **ID thực tế** của Attribute (Complexity IDs 1-5, Volume IDs 6-10, Clarity IDs 11-15).
 - **Ngôn ngữ & nội dung Task/Doc:** Mọi `title` và `description` của Task, BUG, Test Case và Document do agent tạo ra phải:
   - Viết bằng **tiếng Việt**, ngắn gọn, dễ hiểu, gợi rõ chức năng/nhiệm vụ liên quan (ví dụ tốt: `"Sửa luồng đăng nhập SSO khi token hết hạn"`; ví dụ kém: `"Fix bug auth"` hoặc `"Task 1"`).
   - `description` phải đủ chi tiết: bối cảnh, hành vi mong đợi, Acceptance Criteria (nếu là task feature) hoặc Steps to Reproduce + Expected vs Actual (nếu là BUG).

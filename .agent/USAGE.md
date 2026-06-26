@@ -21,7 +21,7 @@ Trong mọi workflow, các tham số trong `[...]` đều thuộc một trong c�
 |---|---|---|
 | `[project]` hoặc `[mã project]` | **Mã project** trên FARE — chuỗi viết hoa duy nhất do người tạo project đặt (vd `FARE`, `CRM`, `EDTECH`) | Xem trên giao diện FARE góc trên, hoặc gõ `list_projects` |
 | `[id doc]` / `[id spec]` | **ID số của tài liệu** | URL doc trên FARE có dạng `fare://documents/245` → ID là `245`. Hoặc `list_documents` |
-| `[id module]` / `[id function]` | **ID số của module/submodule/function** | `list_modules` hoặc resource `fare://projects/{project}/modules` |
+| `[id module]` / `[id function]` | **ID số của plan item (theme/epic/story)** | `list_plan_items` hoặc resource `fare://projects/{project}/plan-items` |
 | `[tên ...]` | **Chuỗi tự do** mô tả việc (vd "Quản lý nhân viên") | Bạn tự đặt — agent dùng để khoanh phạm vi |
 | `"[mô tả ...]"` | Chuỗi dài có dấu cách → **bọc trong dấu ngoặc kép** | Bạn tự viết |
 | `?` ở cuối tham số | **Tùy chọn** — có thể bỏ qua, agent sẽ hỏi nếu cần | — |
@@ -70,7 +70,8 @@ Trong mọi workflow, các tham số trong `[...]` đều thuộc một trong c�
 | Thêm / sửa thuật ngữ trong glossary | `/fare-ba [project] glossary` | "Bổ sung term ... vào glossary" |
 | Tách 1 file Word/PDF/Excel yêu cầu → nhiều doc FARE | `/fare-ba [project] [id doc nguồn]` | "Tách file này thành doc FARE" |
 | Dọn lại form bản nháp local cho gọn | (gọi skill `fare-doc-normalize` qua lời) | "Làm sạch form file nháp ..." |
-| Tạo / sửa cây Module → Submodule → Function | `/fare-plan [project]` | "Cần tạo module cho phạm vi ..." |
+| Tạo / sửa cây plan item theme › epic › story | `/fare-plan [project]` | "Cần tạo cây kế hoạch cho phạm vi ..." |
+| Chấm / kiểm cây plan item đã có đạt chuẩn chưa | `/fare-plan-review [project] [theme?]` | "Soi giúp cây kế hoạch này phân rã ổn chưa" |
 | Kiểm "yêu cầu nào chưa có test/task phủ" | `/fare-trace [project] [module?]` | "Soát phủ test cho module ..." |
 | Khách / sếp đổi yêu cầu giữa chừng | `/fare-change [project] [id spec] "[đổi gì]"` | "Khách yêu cầu đổi ..." |
 
@@ -83,9 +84,9 @@ Trong mọi workflow, các tham số trong `[...]` đều thuộc một trong c�
 | Status snapshot project (PM standup) | `/fare-pm [project]` | "Status sprint hiện tại" |
 | Grooming backlog (cuối ngày / cuối sprint) | `/fare-groom [project]` | "Soát backlog dùm" |
 | Triage bug (gán severity / assignee) | `/fare-groom [project] - bug-triage` | "Triage bug đang mở" |
-| Tạo Epic / initiative cross-module mới | `/fare-epic [project] create` | "Tạo epic Mobile Redesign v2" |
-| Bulk gán task cũ vào 1 epic | `/fare-epic [project] assign-tasks [id]` | "Gom 20 task này vào epic Payment v3" |
-| Đóng epic khi 100% task DONE | `/fare-epic [project] close [id]` | "Đóng epic FCORE-5" |
+| Thêm epic mới dưới một theme | `/fare-epic [project] add` | "Thêm epic Phân quyền dưới theme Quản lý Dự án" |
+| Đổi tên / mô tả / effort_est_level của epic | `/fare-epic [project] [id epic]` | "Đặt effort_est_level L2 cho epic này" |
+| Sắp / gom story vào đúng epic | `/fare-epic [project] [id epic]` | "Chuyển story này sang epic kia" |
 
 ### Vai QA — viết test & verify
 | Bạn muốn… | Gõ workflow | Hoặc nói (Cách 2) |
@@ -115,8 +116,8 @@ Trong mọi workflow, các tham số trong `[...]` đều thuộc một trong c�
 
 ### Agent sẽ DỪNG để hỏi bạn — đừng bất ngờ
 Mỗi việc thay đổi dữ liệu, agent đều phải xác nhận với bạn (rule `fare-rules.md` §2). Cụ thể agent sẽ dừng & chờ khi:
-- Trước khi `create_document` / `patch_document` / `update_document` lên FARE.
-- Trước khi `add_module` / di chuyển doc.
+- Trước khi `create_document` / `edit_document` / `update_document` lên FARE.
+- Trước khi `add_plan_item` / di chuyển doc.
 - Khi yêu cầu thiếu thông tin (Socratic Gate §5 — hỏi ≥2 câu về edge case / vai / ngưỡng).
 - Khi cần chốt vị trí folder/module để đẩy doc.
 
@@ -152,7 +153,7 @@ Mặc định là **Substitute** (agent đỡ vai BA cho dev — chủ động �
    ```
    Trong đó: `FARE` = mã project · `Đăng nhập bằng mật khẩu` = tên tính năng bạn muốn viết spec cho.
 3. Agent sẽ:
-   - Đọc ngữ cảnh project (cây module, tài liệu liên quan).
+   - Đọc ngữ cảnh project (cây plan item, tài liệu liên quan).
    - Hỏi bạn 2 câu để làm rõ yêu cầu (vd "ai là actor chính?", "có hỗ trợ quên mật khẩu không?").
    - Đề xuất loại doc (Use Case / User Story / SRS...) + vị trí đẩy lên FARE.
    - **CHỜ bạn chốt** rồi mới tạo.

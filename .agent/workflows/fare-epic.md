@@ -1,30 +1,33 @@
 ---
 name: fare-epic
-description: Quản Epic / initiative cross-module — tạo epic mới, đổi status (planned/in_progress/at_risk/done), gán owner + dates, bulk assign tasks, close khi 100% task DONE. Vai PM. Phân biệt Epic ≠ Module ≠ Campaign.
+description: Quản epic ở cấp PLAN ITEM (cây theme › epic › story) — thêm epic dưới một theme, đổi tên/mô tả, đặt effort_est_level, gom story. Vai PM/BA. LƯU Ý bản FARE mới đã bỏ "Epic initiative độc lập" (status/owner/at_risk/bulk-assign).
 ---
 
-# /fare-epic — Quản Epic
+# /fare-epic — Epic ở cấp Plan item
 
-**Việc:** CRUD Epic / initiative — tạo mới, đổi status / owner / dates, bulk assign tasks, đề xuất close khi đủ điều kiện.
+**Việc:** thao tác epic trong cây plan item — thêm epic dưới theme, đổi tên/mô tả, đặt `effort_est_level`, sắp story.
 **Cú pháp:** `/fare-epic [mã project] [hành động? | id epic?]`
 **Đầu vào người dùng:** $ARGUMENTS
-- Không tham số sau project → liệt epic hiện có (`query_epics` LIST), hỏi User muốn làm gì.
-- `[hành động?]`: `create` · `status` · `assign-tasks` · `close`.
+- Không tham số sau project → liệt epic hiện có (`list_plan_items` lọc `type="epic"`), hỏi User muốn làm gì.
+- `[hành động?]`: `add` · `rename` · `effort` · `organize`.
 - `[id epic?]`: làm việc với 1 epic cụ thể.
 
 **Agent phụ trách:** `fare-project-manager` (chạy skill `fare-epic-management`).
+
+> ⚠️ Bản FARE mới KHÔNG còn `create_epic`/`update_epic`/`query_epics`, không status/owner/at_risk/due_date/bulk-assign của epic. Epic giờ là **cấp giữa** của cây WBS — thao tác qua `add_plan_item`/`update_plan_item`/`list_plan_items`. <!-- lint:allow -->
 
 ## Luồng
 1. Kích hoạt agent `fare-project-manager`.
 2. Xác định **chế độ vận hành** (`rules/operating-mode.md`) nếu ngữ cảnh chưa rõ.
 3. Agent chạy SOP `fare-epic-management`:
-   - **Tạo:** Socratic 2 câu (tên + owner + status + dates + color + desc) → trình nháp → CHỜ User chốt → `create_epic`.
-   - **Đổi status:** `query_epics(epicId)` lấy state hiện tại → đề xuất status mới + lý do → CHỜ chốt → `update_epic`. Close → kiểm 100% task DONE (rule cứng).
-   - **Bulk assign:** `list_tasks` lọc ứng viên → trình + CHỜ chốt → `update_epic(task_ids_to_assign)` ≤ 500 / batch.
+   - **Thêm epic:** `list_plan_items` lấy `id` theme cha → trình nháp → CHỜ User chốt → `add_plan_item(type="epic", parent_id=<theme>)`.
+   - **Đổi tên/mô tả/effort:** `update_plan_item(itemId, name=…/comment=…/effort_est_level="L2")`. Epic KHÔNG nhận complexity/scope/clarity (đó là story).
+   - **Sắp story:** tạo `add_plan_item(type="story", parent_id=<epicId>)` hoặc đổi `parent_id` story (di chuyển — §2).
 
 ## Bàn giao
-- Cần spec cấp initiative → BA `/fare-ba` viết BRD/SRS, có thể đề xuất tạo Epic kèm.
-- Task chưa tồn tại cần tạo mới + gắn epic → PM `/fare-breakdown` (Bước 0 hỏi epic).
-- Grooming epic (at_risk / quá hạn / no owner) → PM `/fare-groom`.
-- Quản campaign QA / release (khác epic) → User thao tác trên FARE UI; agent không có MCP tool campaign.
-- Archive epic sau done → User thao tác trên UI (agent không tự archive — §7).
+- Dựng cả cây từ phạm vi nghiệp vụ → BA `/fare-plan` (`fare-plan-breakdown`).
+- Ước effort story (complexity/scope/clarity) → `fare-effort-estimation`.
+- Task mới gom dưới story → PM `/fare-breakdown`.
+- Spec cho phạm vi epic → BA `/fare-ba`.
+- Soát task lệch trạng thái → PM `/fare-groom`.
+- Quản campaign QA / release (khác plan item) → User thao tác trên FARE UI; agent không có MCP tool campaign.

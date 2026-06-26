@@ -4,7 +4,7 @@
 
 `create_document(doc_type="richtext", purpose=<chọn dưới>, content=<Markdown>)` — `content_format` FARE tự set `tiptap`.
 
-> Mẹo: với `purpose ∈ {srs, brd, prd}` FARE có **template hệ thống**. Tạo doc với `content` bỏ trống → FARE tự inject khuôn chuẩn (ISO 29148 / BABOK v3 / Cagan). Sau đó dùng `patch_document` điền nội dung từng block. Tránh việc tự gõ lại template.
+> Mẹo: với `purpose ∈ {srs, brd, prd}` FARE có **template hệ thống**. Tạo doc với `content` bỏ trống → FARE tự inject khuôn chuẩn (ISO 29148 / BABOK v3 / Cagan). Sau đó dùng `edit_document` điền nội dung từng block. Tránh việc tự gõ lại template.
 
 ## Chọn purpose — KHÔNG dùng chung
 
@@ -22,7 +22,7 @@ KHÔNG tự quyết — hỏi User chọn 1 trong các purpose ở trên (Socrat
 ## Quy trình ưu tiên (khi có template hệ thống)
 1. `create_document(doc_type="richtext", purpose="<srs|brd|prd>")` — bỏ `content` để FARE inject template.
 2. `read_document(id)` — đọc lại các block (dùng `mode="blocks"` để có ID ổn định).
-3. `patch_document(id, ops=[...])` — điền từng block (replace text trong placeholder `<...>`).
+3. `edit_document(id, ops=[...])` — điền từng block (replace text trong placeholder `<...>`).
 4. Mục nào yêu cầu không có → **xóa hẳn block** đó. KHÔNG để lại "N/A" hay placeholder trống.
 
 ## Khi không có template (`requirement` / `analysis` / `meeting-notes`)
@@ -61,7 +61,7 @@ Vấn đề kinh doanh đang giải quyết + kết quả kỳ vọng (đo đư�
 - **Khả dụng:** {uptime / RTO / RPO}
 
 ## 7. Phụ thuộc & Tài liệu liên quan
-- [{tên doc}](fare://documents/{id}) — vai trò
+- `fare://documents/{id}` — {tên doc}, vai trò. *(URI trần tự thành chip mention bấm được; muốn nhãn riêng → chip HTML `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">…</a>` — phải đủ `data-type="mention"` kẻo bị nhân đôi; xem `fare-mcp-integration`. KHÔNG markdown link.)*
 
 ## 8. Vấn đề mở
 - ⚠️ {câu hỏi chờ stakeholder trả lời}
@@ -119,7 +119,7 @@ Nêu phương án đề xuất + lý do. ⚠️ Đây CHƯA phải decision — 
 
 - **Định danh:** FR-`NNN`, BR-`NNN`, NFR-`NNN`. KHÔNG đánh số lại khi thêm — chèn nối tiếp.
 - **Testable:** mỗi FR phải kiểm chứng được. "Hệ thống lưu mã NV duy nhất trong phạm vi 1 trường" ✅; "Hệ thống nhanh" ❌.
-- **Tham chiếu UC/US chi tiết** ở mục Phụ thuộc dạng `[{tên} {id mục}](fare://documents/{id})` — KHÔNG lặp lại nội dung UC/US trong requirement.
+- **Tham chiếu UC/US chi tiết** ở mục Phụ thuộc bằng **chip mention** (`fare://documents/{id}` → chip, xem `fare-mcp-integration`) — KHÔNG markdown link, KHÔNG lặp lại nội dung UC/US trong requirement.
 - **MoSCoW** enum cho ưu tiên: `Must | Should | Could | Won't`.
 - **Mục không có nội dung** → BỎ HẲN heading. KHÔNG "N/A".
 - **Vấn đề mở (Open Questions)** — bắt buộc nếu Socratic Gate còn chưa được trả lời. Đừng xóa khi chưa giải quyết.

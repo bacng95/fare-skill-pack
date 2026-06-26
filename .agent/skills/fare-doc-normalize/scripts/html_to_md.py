@@ -15,8 +15,10 @@ Script CHỈ lo phần lặp-lại deterministic:
   - Bậc thụt lề ĐA KIỂU → bullet markdown: <ul><li>, <p data-indent=N>,
     style padding-left:Npx, marker ⟨INDENT:pl=N⟩, dòng mở đầu '+'/'-'.
   - <img src="fare://files/KEY"> → ![Ảnh minh hoạ](fare://files/KEY) (BỎ alt AI noise).
-  - <s>→ ~~...~~ (giữ: nội dung đã bỏ).  <mark>→ giữ text bỏ thẻ.
-  - comment-highlight → text + ' ⚠️(comment chưa chốt)'.
+  - <s>→ ~~...~~ (giữ: formatting nguồn, nghĩa nội dung đã bỏ).  <mark>→ text trơn bỏ thẻ.
+  - comment-highlight → text TRƠN (KHÔNG nhét ⚠️ vào doc — adulterate tài liệu).
+  - Markup biên tập (s/mark/comment) được gom & in ra STDERR để agent báo User
+    ngoài luồng; STDOUT chỉ chứa nội dung sạch.
   - <strong>/<b> → **...**.  <a href>→ [text](href).
   - Bỏ data-id/style/colspan/&nbsp;/<ul><li> rỗng.
 
@@ -77,6 +79,10 @@ class SpecHTMLParser(HTMLParser):
         self.fmt = []            # 'b','s','mark','comment'
         self.href = None
         self.in_cell = False
+        # markup biên tập (comment/highlight/gạch) → KHÔNG nhét ⚠️ vào doc;
+        # gom ra stderr để agent báo User ngoài luồng. (s vẫn giữ ~~..~~ trong doc.)
+        self.findings = []       # list[(type, text)]
+        self._caps = []          # list[[type, parts]] đang mở
 
     # ---- helpers ----
     def _new_line(self, indent=0, bullet=False):
@@ -91,6 +97,16 @@ class SpecHTMLParser(HTMLParser):
         # apply current inline format wrappers around raw chunk later;
         # here we append already-wrapped text
         self.cur_line.parts.append(s)
+
+    def _flush_cap(self, typ):
+        # đóng span biên tập trên cùng khớp typ → ghi vào findings (báo User), KHÔNG ra doc
+        for i in range(len(self._caps) - 1, -1, -1):
+            if self._caps[i][0] == typ:
+                _, parts = self._caps.pop(i)
+                txt = "".join(parts).strip()
+                if txt:
+                    self.findings.append((typ, txt))
+                return
 
     @staticmethod
     def _indent_from_attrs(attrs):
@@ -135,12 +151,12 @@ class SpecHTMLParser(HTMLParser):
         elif tag in ("strong", "b"):
             self.fmt.append("b"); self._emit("**")
         elif tag == "s" or tag == "del" or tag == "strike":
-            self.fmt.append("s"); self._emit("~~")
+            self.fmt.append("s"); self._caps.append(["s", []]); self._emit("~~")
         elif tag == "mark":
-            self.fmt.append("mark")  # bỏ thẻ, giữ text
+            self.fmt.append("mark"); self._caps.append(["mark", []])  # bỏ thẻ, giữ text
         elif tag == "span":
             if "comment-highlight" in d.get("class", ""):
-                self.fmt.append("comment")
+                self.fmt.append("comment"); self._caps.append(["comment", []])
         elif tag == "a":
             self.href = d.get("href", "")
             self._emit("[")
@@ -162,13 +178,13 @@ class SpecHTMLParser(HTMLParser):
                 self.fmt.pop(); self._emit("**")
         elif tag in ("s", "del", "strike"):
             if self.fmt and self.fmt[-1] == "s":
-                self.fmt.pop(); self._emit("~~")
+                self.fmt.pop(); self._flush_cap("s"); self._emit("~~")
         elif tag == "mark":
             if self.fmt and self.fmt[-1] == "mark":
-                self.fmt.pop()
+                self.fmt.pop(); self._flush_cap("mark")  # bỏ thẻ; text trơn, KHÔNG ⚠️
         elif tag == "span":
             if self.fmt and self.fmt[-1] == "comment":
-                self.fmt.pop(); self._emit(" ⚠️(comment chưa chốt)")
+                self.fmt.pop(); self._flush_cap("comment")  # text trơn, KHÔNG ⚠️
         elif tag == "a":
             href = self.href or ""
             self._emit(f"]({href})")
@@ -194,6 +210,8 @@ class SpecHTMLParser(HTMLParser):
             self.cur_line.indent = round(int(m.group(1)) / 32)
             text = text[m.end():]
         if text:
+            for cap in self._caps:
+                cap[1].append(text)
             self._emit(text)
 
     def handle_entityref(self, name):
@@ -212,7 +230,7 @@ def render(parser):
             joined = " ".join(l.text() for l in cell.lines if l.text())
             heading = section_heading(re.sub(r"[*~]", "", joined))
             if heading and len(cell.lines) <= 2:
-                out.append("\n" + heading)
+                out.append(heading)
             else:
                 _render_lines(cell.lines, out)
         elif len(nonempty) >= 2:
@@ -225,9 +243,22 @@ def render(parser):
                 # 2 cột nhưng không phải k-v chuẩn → render lần lượt
                 for c in nonempty:
                     _render_lines(c.lines, out)
-    text = "\n".join(out)
+    text = _join_blocks(out)
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip() + "\n"
+
+
+def _join_blocks(lines):
+    # bullet liền bullet → newline đơn (giữ list gọn); còn lại → blank line
+    # (CommonMark: 2 paragraph cách 1 newline bị gộp thành 1 → phải blank line).
+    res = []
+    for i, ln in enumerate(lines):
+        if i:
+            prev, cur = lines[i - 1].lstrip(), ln.lstrip()
+            both_bullets = prev.startswith("- ") and cur.startswith("- ")
+            res.append("\n" if both_bullets else "\n\n")
+        res.append(ln)
+    return "".join(res)
 
 
 def _render_lines(lines, out):
@@ -273,6 +304,16 @@ def main():
     if head:
         sys.stdout.write("\n".join(head) + "\n\n")
     sys.stdout.write(body)
+
+    # Markup biên tập → báo ra stderr (KHÔNG nhét vào doc). Agent relay cho User.
+    if p.findings:
+        labels = {"s": "GẠCH BỎ ở nguồn (giữ ~~..~~ trong doc, nghĩa: nội dung đã bỏ)",
+                  "mark": "HIGHLIGHT ở nguồn (đã bỏ màu, giữ text trơn)",
+                  "comment": "COMMENT chưa chốt ở nguồn (đã bỏ, giữ text trơn)"}
+        sys.stderr.write("\n⚠️  MARKUP BIÊN TẬP — báo User, KHÔNG nhét vào doc:\n")
+        for typ, txt in p.findings:
+            snippet = txt if len(txt) <= 120 else txt[:117] + "…"
+            sys.stderr.write(f"  - [{labels.get(typ, typ)}] \"{snippet}\"\n")
 
 
 if __name__ == "__main__":
