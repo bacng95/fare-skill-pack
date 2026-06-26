@@ -14,7 +14,7 @@ description: Phân tích yêu cầu nghiệp vụ → viết Use Case / User Sto
 1. Kích hoạt agent `fare-business-analyst`.
 2. Xác định **chế độ vận hành** (Substitute / Assistant — `rules/operating-mode.md`) nếu ngữ cảnh chưa rõ.
 3. Agent chạy SOP: khám phá ngữ cảnh (skill `fare-context-discovery`) → Socratic Gate → viết đặc tả nghiệp vụ. Nếu là tách / chuẩn hóa tài liệu có sẵn → dùng skill `fare-doc-split`.
-4. Đồng bộ FARE (`status="draft"`, gắn `module_id`), trả URI tài liệu cho User.
+4. Đồng bộ FARE (`status="draft"`, gắn `plan_item_id`), trả URI tài liệu cho User.
 
 ## Bàn giao
 Gợi ý bước kế: `/fare-audit-spec` để soát đặc tả vừa viết.

@@ -1,7 +1,7 @@
 {
   "name": "fare-skill-pack",
-  "version": "1.1.0",
-  "description": "Antigravity / Claude Code skill pack for FARE — 6 agents (BA · PM · QA · Dev · technical-writer · spec-reviewer), 22 skills, 16 workflows operating FARE via MCP.",
+  "version": "2.0.0",
+  "description": "Antigravity / Claude Code skill pack for FARE — 6 agents (BA · PM · QA · Dev · technical-writer · spec-reviewer), 23 skills, 18 workflows operating FARE via MCP.",
   "type": "module",
   "bin": {
     "fare-skill-pack": "bin/fare-skill.mjs",
@@ -15,7 +15,8 @@
   ],
   "scripts": {
     "prepare": "node bin/prepack.mjs",
-    "sync:claude": "node bin/sync-claude.mjs",
+    "check:tools": "node bin/check-tools.mjs",
+    "sync:claude": "node bin/check-tools.mjs && node bin/sync-claude.mjs",
     "dev": "node bin/sync-claude.mjs --watch",
     "test:pack": "npm pack --dry-run"
   },

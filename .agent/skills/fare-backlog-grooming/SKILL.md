@@ -9,7 +9,7 @@ Dùng khi: cuối ngày / cuối tuần / cuối sprint, PM cần kiểm trạng
 
 ## Tiền đề
 - Bản đồ ngữ cảnh — biết project + sprint hiện hành.
-- Tuân `rules/fare-rules.md`: §1 (mọi task có `module_id`), §5 (bug discovery cần xác nhận trước khi tạo BUG task), §6 (4-state lifecycle TODO→IN_PROGRESS→VERIFYING→DONE), §2 Confirmation Gate (mọi `update_task` hàng loạt cần User chốt).
+- Tuân `rules/fare-rules.md`: §1 (mọi task có `plan_item_id`), §5 (bug discovery cần xác nhận trước khi tạo BUG task), §6 (4-state lifecycle TODO→IN_PROGRESS→VERIFYING→DONE), §2 Confirmation Gate (mọi `update_task` hàng loạt cần User chốt).
 
 ## Bước 0 — Chốt phạm vi
 
@@ -29,8 +29,7 @@ Hỏi & CHỜ:
 | `list_tasks(projectCode, type="BUG")` | Bug list — không lọc status, để thấy mọi bug đang mở |
 | `list_tasks(projectCode, type="BUG", bug_origin="INTRINSIC")` | Bug nội sinh đang chặn task cha (xem `linked_task_id` để biết chặn task nào) |
 | `list_tasks(projectCode, type="BUG", bug_origin="EXTRINSIC")` | Bug độc lập — triage riêng, không chặn task |
-| `query_epics(projectCode, status="live")` | Epic đang chạy (planned + in_progress + at_risk) |
-| `query_epics(epicId)` (cho từng epic live) | GET mode kèm `task_stats` (breakdown task status) + progress |
+| `list_plan_items(projectCode)` | Cây WBS (theme/epic/story) — soi nhánh rỗng (epic/story không có con / không task) |
 | `list_test_cases(projectCode, ...)` cho mỗi task `type=TEST` `DONE` | Kiểm `verify_history.passed` |
 
 Với mỗi task `IN_PROGRESS`: `list_tasks(id=<id>)` lấy chi tiết + comments để xem `updated_at` của comment cuối.
@@ -44,17 +43,14 @@ Với mỗi task `IN_PROGRESS`: `list_tasks(id=<id>)` lấy chi tiết + comment
 | **Skip lifecycle** | Lịch sử nhảy `TODO → DONE` không qua `IN_PROGRESS`/`VERIFYING` | 🟥 BLOCKER — vi phạm §6 |
 | **Quá hạn** | `end_at < hôm nay` mà `meta_status ≠ DONE` | 🟧 HIGH |
 | **Mồ côi spec** | `description` không có URI `fare://documents/{id}` | 🟨 MEDIUM — vi phạm §4 |
-| **Mồ côi module** | `module_id` rỗng / không hợp lệ | 🟥 BLOCKER — vi phạm §1 (nhưng FARE schema cấm, hiếm gặp) |
+| **Mồ côi module** | `plan_item_id` rỗng / không hợp lệ | 🟥 BLOCKER — vi phạm §1 (nhưng FARE schema cấm, hiếm gặp) |
 | **TODO bỏ quên** | `created_at` > 14 ngày mà vẫn `TODO`, không assignee | 🟨 MEDIUM — backlog có khả năng outdated |
 | **Bug chưa triage** | `type=BUG` không có `severity` hoặc `priority` | 🟧 HIGH |
 | **Bug stuck** | `type=BUG` `severity=blocker` mà `TODO` > 24h | 🟥 BLOCKER |
 | **Task chặn bởi bug INTRINSIC** | Task `VERIFYING`/`IN_PROGRESS` có bug INTRINSIC open (`list_tasks(type="BUG", bug_origin="INTRINSIC", linked_task_id=<task>)`) — task không thể DONE đến khi bug đóng | 🟧 HIGH — feature chưa đạt AC, đang treo |
 | **Bug INTRINSIC mồ côi** | `type=BUG`, `bug_origin="INTRINSIC"` nhưng `linked_task_id` rỗng/không hợp lệ | 🟨 MEDIUM — không biết chặn task nào, semantic sai |
 | **EXTRINSIC bug tồn đọng** | `type=BUG`, `bug_origin="EXTRINSIC"`, `TODO` > 14 ngày | 🟨 MEDIUM — bug độc lập không ai pickup |
-| **Epic at_risk** | `query_epics(status="at_risk")` | 🟧 HIGH — initiative đang trễ, cần re-plan |
-| **Epic quá hạn** | `due_date < hôm nay` mà `status ∉ {done, archived}` | 🟥 BLOCKER nếu task_count > 0 chưa done; 🟧 HIGH nếu epic gần xong |
-| **Epic không owner** | `status ∈ {planned, in_progress, at_risk}` mà `owner_id = null` | 🟨 MEDIUM — không ai chịu trách nhiệm initiative |
-| **Task mồ côi epic** | Task active (TODO/IN_PROGRESS) gắn `module_id` của function thuộc 1 initiative đang chạy (xem epic.task_stats để biết function nào nằm trong epic) mà chưa có `epic_id` | 🟨 MEDIUM — mất truy nguồn initiative |
+| **Nhánh WBS rỗng** | epic không có story con, hoặc story không có task nào (`list_plan_items` + `list_tasks(plan_item_ids=[...])`) | 🟨 MEDIUM — cấu trúc thừa hoặc spec chưa được vỡ thành task |
 
 ## Bước 3 — Báo cáo (KHÔNG sửa)
 
@@ -115,11 +111,7 @@ User chốt từng item hoặc nhóm → thực thi tuần tự. KHÔNG batch t�
 - **EXTRINSIC bug tồn đọng** → triage như bug thường (assign owner, đẩy sprint, hoặc archive). KHÔNG link task nào.
 - **Mồ côi spec (description không URI)** → `update_task(description=<nguyên văn + section "Tài liệu liên quan">)`. Nếu chưa có doc nào, ghi "tài liệu sẽ bổ sung — bàn giao BA" (rule §4).
 - **TODO bỏ quên** → đề xuất 1 trong 3: assign owner, đẩy sang sprint sau, hoặc **archive** (cần User chốt). KHÔNG tự `delete_task` (§2 — delete cần User nói rõ).
-- **Epic at_risk** (đã ở status `at_risk`) → KHÔNG tự đổi status. Báo cáo cho User + đề xuất 3 hướng: (a) re-plan scope (bàn giao PM `/fare-epic`: split task / defer task / extend due_date qua `update_epic`), (b) bàn giao BA `/fare-change` re-spec nếu lỗi do yêu cầu thay đổi, (c) thêm nhân lực (PM gán thêm assignee qua `/fare-breakdown` mới). Đề xuất hướng phù hợp với root cause (xem `task_stats` của epic để đoán).
-- **Epic in_progress mà tiến độ trễ** (epic status còn `in_progress` nhưng `progress < 50%` và đã qua 75% thời gian giữa start_date và due_date) → đề xuất `update_epic(status="at_risk")` để confirm; CHỜ User chốt (§2 — đổi status epic là quyết định quan trọng).
-- **Epic quá hạn** (`due_date < hôm nay` mà `status ∉ {done, archived}`) → đề xuất 1 trong 3: (a) extend due_date (`update_epic(due_date=...)`) nếu User chấp nhận trễ, (b) `update_epic(status="done")` NẾU 100% task DONE (rule cứng), (c) `update_epic(status="at_risk")` + bàn giao PM/BA re-plan. KHÔNG mặc định extend.
-- **Epic không owner** (`owner_id = null` mà status `∈ {planned, in_progress, at_risk}`) → đề xuất gán owner qua `update_epic(owner_id=<user_id từ list_projects(include_members=true)>)`. Đợi User chốt.
-- **Task mồ côi epic** (task active gắn `module_id` của function thuộc epic đang chạy mà chưa có `epic_id`) → đề xuất bulk assign qua `update_epic(epicId, task_ids_to_assign=[...])`. Đợi User chốt; KHÔNG batch >500/call (rule skill `fare-epic-management`).
+- **Nhánh WBS rỗng** → KHÔNG tự xóa. Báo User: epic/story nào không có con / không task. Đề xuất: (a) vỡ story thành task (bàn giao PM `/fare-breakdown`), (b) gắn spec nếu thiếu (bàn giao BA `/fare-ba`), hoặc (c) gỡ nhánh thừa qua `delete_plan_item(confirm=true)` nếu User xác nhận (server chặn nếu còn task).
 
 ## Bug discovery khi grooming (≠ tạo bug mới)
 

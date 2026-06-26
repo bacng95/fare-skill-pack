@@ -6,8 +6,8 @@
 
 ## Tổng quan
 - **6 Agent** — vai chuyên trách (persona + SOP)
-- **22 Skill** — 19 năng lực FARE + 3 tiện ích đọc file
-- **16 Workflow** — slash-command mỏng
+- **23 Skill** — 20 năng lực FARE + 3 tiện ích đọc file
+- **18 Workflow** — slash-command mỏng
 - **3 Rule** — always-on, mọi agent tuân thủ
 
 ## Cấu trúc thư mục
@@ -16,8 +16,8 @@
 ├── ARCHITECTURE.md     # File này — danh bạ điều hướng
 ├── USAGE.md            # Hướng dẫn cho người mới
 ├── agents/             # 6 agent
-├── skills/             # 22 skill (mỗi skill 1 thư mục có SKILL.md)
-├── workflows/          # 16 slash-command
+├── skills/             # 23 skill (mỗi skill 1 thư mục có SKILL.md)
+├── workflows/          # 18 slash-command
 └── rules/              # 3 rule always-on
 ```
 
@@ -28,14 +28,14 @@
 
 | Agent | Vai trò | Skills dùng |
 |---|---|---|
-| `fare-business-analyst` | Phân tích yêu cầu; viết & tách đặc tả; chia cây module; truy vết phủ; xử lý change request | context-discovery, mcp-integration, spec-authoring, doc-split, doc-normalize, traceability, plan-breakdown, change-request |
-| `fare-project-manager` | Chia function thành task; ước effort (FP); tạo & cập nhật month plan; grooming backlog; triage bug | context-discovery, mcp-integration, task-breakdown, effort-estimation, plan-versioning, backlog-grooming |
+| `fare-business-analyst` | Phân tích yêu cầu; viết & tách đặc tả; chia cây plan item; truy vết phủ; xử lý change request | context-discovery, mcp-integration, spec-authoring, doc-split, doc-normalize, traceability, plan-breakdown, change-request |
+| `fare-project-manager` | Chia story thành task; ước effort (FP); tạo & cập nhật month plan; grooming backlog; triage bug | context-discovery, mcp-integration, task-breakdown, effort-estimation, plan-versioning, backlog-grooming |
 | `fare-qa-engineer` | Viết test case từ AC; chạy verify atomic; báo bug reproducible (qua §5) | context-discovery, mcp-integration, test-authoring, test-execution, bug-reporting |
 | `fare-developer` | Pickup task; impact analysis qua code intelligence; self-verify & handoff với evidence. KHÔNG tự code (§8) | context-discovery, mcp-integration, task-pickup, impact-analysis, self-verify |
 | `fare-technical-writer` | Viết tài liệu kỹ thuật (api_doc, erd, diagram, specification) | context-discovery, mcp-integration |
 | `fare-spec-reviewer` | Soát spec đã có — 6 lăng kính (gồm UI/UX vs Figma) | context-discovery, mcp-integration |
 
-## Skills (21)
+## Skills (23)
 
 **Năng lực FARE — chung**
 | Skill | Việc |
@@ -49,18 +49,19 @@
 | `fare-spec-authoring` | Viết MỚI đặc tả — use_case · user_story · richtext (BRD/SRS/PRD/requirement/analysis/meeting-notes) · glossary |
 | `fare-doc-split` | Tách tài liệu nguyên khối thành nhiều doc (trung thực) |
 | `fare-doc-normalize` | Làm sạch form bản nháp local trước khi đẩy FARE |
-| `fare-plan-breakdown` | Chia cây Module → Submodule → Function 3 cấp (BA-light) |
-| `fare-traceability` | Ma trận requirement ↔ UC ↔ US ↔ test ↔ task ↔ module + phát hiện gap |
+| `fare-plan-breakdown` | Chia cây plan item theme › epic › story (3 cấp, BA-light) — trục giá trị |
+| `fare-plan-review` | Chấm / kiểm toán cây plan item đã có theo rubric (nghiệm thu được · không tầng giả · đủ 3 tầng) |
+| `fare-traceability` | Ma trận requirement ↔ UC ↔ US ↔ test ↔ task ↔ plan item + phát hiện gap |
 | `fare-change-request` | Xử lý yêu cầu thay đổi spec đã có (impact + diff + log) |
 
 **Vai PM**
 | Skill | Việc |
 |---|---|
-| `fare-task-breakdown` | Chia 1 function (đã có spec) thành n task BE/FE/DB/test/infra; batch create |
+| `fare-task-breakdown` | Chia 1 story (đã có spec) thành n task BE/FE/DB/test/infra; batch create |
 | `fare-effort-estimation` | Function Point analysis: complexity (1-5) × scope (6-10) × clarity (11-15) → effort matrix |
 | `fare-plan-versioning` | Master vs month plan; DRAFT vs PUBLIC; tạo / cập nhật month plan an toàn |
-| `fare-backlog-grooming` | Quét task lệch trạng thái, bug triage, epic at_risk/quá hạn, đề xuất sửa + handoff |
-| `fare-epic-management` | CRUD Epic (initiative cross-module): tạo, đổi status, bulk assign tasks, close 100% DONE |
+| `fare-backlog-grooming` | Quét task lệch trạng thái, bug triage, nhánh WBS rỗng, đề xuất sửa + handoff |
+| `fare-epic-management` | Epic ở cấp plan item: thêm epic dưới theme, đổi tên/mô tả, đặt effort_est_level, gom story |
 
 **Vai QA**
 | Skill | Việc |
@@ -81,20 +82,21 @@
 |---|---|
 | `docx` · `pdf` · `xlsx` | Đọc file Word / PDF / Excel người dùng cung cấp |
 
-## Workflows (15)
+## Workflows (18)
 
 | Command | Việc | Agent | Skill chính |
 |---|---|---|---|
 | `/fare-ba` | Phân tích yêu cầu / viết spec / tách tài liệu | `fare-business-analyst` | `fare-spec-authoring` hoặc `fare-doc-split` |
-| `/fare-plan` | Chia cây module 3 cấp (BA-light) | `fare-business-analyst` | `fare-plan-breakdown` |
+| `/fare-plan` | Chia cây plan item 3 cấp (BA-light) | `fare-business-analyst` | `fare-plan-breakdown` |
+| `/fare-plan-review` | Chấm cây plan item đã có theo rubric | `fare-business-analyst` | `fare-plan-review` |
 | `/fare-trace` | Ma trận truy vết & phát hiện gap | `fare-business-analyst` | `fare-traceability` |
 | `/fare-change` | Yêu cầu thay đổi spec đã có | `fare-business-analyst` | `fare-change-request` |
 | `/fare-write-doc` | Viết tài liệu kỹ thuật | `fare-technical-writer` | — |
 | `/fare-audit-spec` | Soát / kiểm toán spec (6 lăng kính) | `fare-spec-reviewer` | — |
 | `/fare-pm` | Entry vai PM — route theo việc | `fare-project-manager` | (tự chọn) |
-| `/fare-breakdown` | Chia function → tasks (BE/FE/DB/test/infra) | `fare-project-manager` | `fare-task-breakdown` |
-| `/fare-groom` | Grooming backlog + bug triage + epic risk scan | `fare-project-manager` | `fare-backlog-grooming` |
-| `/fare-epic` | CRUD Epic / initiative cross-module | `fare-project-manager` | `fare-epic-management` |
+| `/fare-breakdown` | Chia story → tasks (BE/FE/DB/test/infra) | `fare-project-manager` | `fare-task-breakdown` |
+| `/fare-groom` | Grooming backlog + bug triage + WBS rỗng | `fare-project-manager` | `fare-backlog-grooming` |
+| `/fare-epic` | Epic ở cấp plan item (thêm/sửa/gom story) | `fare-project-manager` | `fare-epic-management` |
 | `/fare-qa` | Entry vai QA — route theo việc | `fare-qa-engineer` | (tự chọn) |
 | `/fare-test` | Viết TC từ AC (ISTQB) | `fare-qa-engineer` | `fare-test-authoring` |
 | `/fare-verify` | Chạy verify round TC, đề xuất chuyển task TEST | `fare-qa-engineer` | `fare-test-execution` (+ `bug-reporting` khi fail) |
@@ -121,15 +123,15 @@ File đầu vào (docs/inputs/)
 ## Vòng đời đầy đủ trên FARE (BA → PM → Dev + QA song song)
 
 ```
-   BA: /fare-plan       → có cây Module/Submodule/Function (chỗ để gắn spec)
+   BA: /fare-plan       → có cây plan item theme/epic/story (chỗ để gắn spec)
          ↓
-   BA: /fare-ba         → viết spec (use_case / user_story / richtext / glossary)
+   BA: /fare-ba         → viết spec (user_story / richtext / glossary)
          ↓
    /fare-audit-spec     → soát blind spot (6 lăng kính, gồm Figma)
          ↓
    BA: /fare-trace      → kiểm phủ spec; bàn giao gap (UC/US thiếu? task thiếu? TC thiếu?)
          ↓
-   PM: /fare-breakdown  → chia function thành task implementable (BE/FE/DB + task type=TEST)
+   PM: /fare-breakdown  → chia story thành task implementable (BE/FE/DB + task type=TEST)
          ↓                  (FP analysis nếu cần — fare-effort-estimation)
    PM: /fare-pm (plan-versioning)  → đẩy task vào month plan / sprint
          ↓
@@ -157,16 +159,17 @@ File đầu vào (docs/inputs/)
 | Thêm / sửa term trong glossary | `/fare-ba` |
 | Tách tài liệu nguyên khối | `/fare-ba` + skill `fare-doc-split` |
 | Làm sạch form bản nháp local | skill `fare-doc-normalize` |
-| Chia / hoàn thiện cây module 3 cấp | `/fare-plan` |
+| Chia / hoàn thiện cây plan item 3 cấp | `/fare-plan` |
+| Chấm / kiểm toán cây plan item đã có | `/fare-plan-review` |
 | Kiểm "yêu cầu này đã có test/task phủ chưa" | `/fare-trace` |
 | Khách đổi yêu cầu, cần sửa spec đã có | `/fare-change` |
 | Viết API doc / ERD / diagram | `/fare-write-doc` |
 | Soát spec đã có (gồm đối chiếu Figma) | `/fare-audit-spec` |
-| Chia function (đã có spec) thành task | `/fare-breakdown` |
+| Chia story (đã có spec) thành task | `/fare-breakdown` |
 | Tạo sprint mới / month plan mới | `/fare-pm` |
-| Ước effort cho module/function | `/fare-pm` (sẽ chạy `fare-effort-estimation`) |
+| Ước effort cho epic/story | `/fare-pm` (sẽ chạy `fare-effort-estimation`) |
 | Grooming backlog / triage bug / epic risk scan | `/fare-groom` |
-| Tạo / quản Epic (initiative cross-module) | `/fare-epic` |
+| Thêm / sửa epic trong cây plan item | `/fare-epic` |
 | Status snapshot project | `/fare-pm` (default) |
 | Viết test case cho 1 spec / function | `/fare-test` |
 | Chạy verify 1 round TC, ghi pass/fail | `/fare-verify` |

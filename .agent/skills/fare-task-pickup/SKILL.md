@@ -40,15 +40,15 @@ Skip task spec mỏng — bàn giao BA `/fare-ba` bổ sung trước; không pic
 
 ## Bước 2 — Đọc chi tiết task được chọn
 
-1. `list_tasks(id=<id>)` — lấy full description, links (blocks/relates_to), test_case_ids, **epic_id**.
+1. `list_tasks(id=<id>)` — lấy full description, links (blocks/relates_to), test_case_ids, `plan_item_id` (story trong cây WBS).
 2. **Scan description** lấy mọi URI `fare://documents/{id}` — đọc HẾT từng cái (paginated):
    - User Story / Use Case → biết AC + flow.
    - ERD → biết bảng + cột (nếu DB task).
    - API doc → biết endpoint + req/resp (nếu BE task).
    - Wireframe / Figma → biết UI/state (nếu FE task).
-3. **Nếu task có `test_case_ids`** → `get_test_case(testCaseId)` cho từng TC — biết acceptance trước khi code, code thẳng để pass TC.
+3. **Nếu task có `test_case_ids`** → `list_test_cases(id=testCaseId)` cho từng TC — biết acceptance trước khi code, code thẳng để pass TC.
 4. **Đọc cả task `blocks`** (xem id trong `links`): nắm cái mình đang chặn cái gì — quan trọng để biết deadline.
-5. **Nếu task có `epic_id`** → `query_epics(epicId)` GET mode lấy initiative context: name, owner, status, due_date, progress, task_stats. Biết task nằm trong initiative lớn nào → hiểu big picture + deadline tổng + ảnh hưởng nếu trễ. Xem `fare-mcp-integration` để phân biệt Epic ≠ Module.
+5. **Định vị trong cây WBS** → `list_plan_items(projectCode)` lấy vị trí story (`plan_item_id` của task) và epic cha (đối chiếu `parent_id`, lọc `type="epic"`). Biết task nằm trong epic / theme nào → hiểu big picture. Muốn xem các task anh em dưới cùng epic: `list_tasks(projectCode, plan_item_ids=[<epicId>], include_descendants=true)`. Xem `fare-mcp-integration` cho cây plan item.
 
 ## Bước 3 — Báo cáo bối cảnh + chốt phạm vi
 
@@ -57,8 +57,7 @@ Trình bảng tóm tắt:
 ## Task pickup: TASK-FARE-87
 Title: [BE] Endpoint POST /employees
 Priority: high · Sprint: Tháng 5/2026 · Effort est: 8h
-Module: Quản lý nhân viên → Hồ sơ → Thêm nhân viên (id=120)
-Epic: "Onboarding Q2 2026" (id=5, owner: Bac Nguyen, due 2026-06-30, progress 40%)
+Cây WBS: Theme "Quản lý nhân viên" → Epic "Hồ sơ nhân viên" → Story "Thêm nhân viên" (plan_item_id=120)
 
 ## Spec
 - US fare://documents/45 → AC-1, AC-2, AC-3
@@ -127,7 +126,7 @@ Báo gọn:
 - [ ] Phạm vi chọn task đã chốt với User (assignee / status / sprint).
 - [ ] Heuristic xếp ưu tiên đã áp dụng — không pickup random.
 - [ ] Mọi URI doc trong task.description đã đọc HẾT (paginated).
-- [ ] TC linked đã `get_test_case` đọc — biết acceptance trước khi code.
+- [ ] TC linked đã `list_test_cases(id=...)` đọc — biết acceptance trước khi code.
 - [ ] Câu hỏi mở (spec mơ hồ) đã liệt kê + báo User TRƯỚC khi IN_PROGRESS.
 - [ ] User đã xác nhận pickup + scope (§2).
 - [ ] `update_task(meta_status="IN_PROGRESS")` + `add_comment` scope đã chạy (§6).

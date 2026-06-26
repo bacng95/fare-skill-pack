@@ -13,7 +13,7 @@ description: Xử lý yêu cầu thay đổi (change request) trên một spec �
 ## Luồng
 1. Kích hoạt agent `fare-business-analyst`.
 2. Xác định **chế độ vận hành** (`rules/operating-mode.md`) nếu ngữ cảnh chưa rõ.
-3. Agent chạy SOP `fare-change-request`: chốt nguồn yêu cầu → đọc bản hiện tại + bản `approved` mới nhất → **báo cáo impact** → đề xuất diff → **CHỜ User chốt** → `patch_document` / `update_document` + ghi change log.
+3. Agent chạy SOP `fare-change-request`: chốt nguồn yêu cầu → đọc bản hiện tại + bản `approved` mới nhất → **báo cáo impact** → đề xuất diff → **CHỜ User chốt** → `edit_document` / `update_document` + ghi change log.
 
 ## Bàn giao
 - Sau khi sửa: gợi ý `/fare-audit-spec` để soát lại spec đã thay đổi.

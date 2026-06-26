@@ -35,7 +35,7 @@ Skill này dạy cách dùng **MCP `fare` tools** để dựng đủ ngữ cản
 ### Tầng 2 — Hàng xóm & cấu trúc
 - `list_documents(projectCode, scope)` → cây thư mục. Tài liệu anh em cho biết artifact thuộc một *bộ* (vd SRS nhiều module).
 - Đọc tài liệu Preamble / Tổng quan / Glossary anh em để lấy domain, vai trò, thuật ngữ chuẩn.
-- `list_modules`, `list_plans` (truyền `id` để xem chi tiết 1 plan) → đã có breakdown plan chưa; cấu trúc/tên plan so với tài liệu.
+- `list_plan_items`, `list_plans` (truyền `id` để xem chi tiết 1 plan) → đã có breakdown plan chưa; cấu trúc/tên cây plan item (theme/epic/story) so với tài liệu.
 
 ### Tầng 3 — Tham chiếu chéo
 Mở mọi tham chiếu trong artifact: link tài liệu, "mục 2.15 / 1.16", nhắc tới ERD, link Figma, ảnh nhúng. Mỗi cái là một nút — phân giải tới đích, hoặc đánh dấu "chưa phân giải / gãy".
@@ -44,10 +44,10 @@ Mở mọi tham chiếu trong artifact: link tài liệu, "mục 2.15 / 1.16", n
 
 | Mục tiêu kế tiếp | Đào sâu | Tool |
 |---|---|---|
-| Phân tích / tách / chuẩn hóa đặc tả | Mô hình dữ liệu + plan + test case | `list_documents(kind="erd")` → `read_document`; `list_modules`; `list_test_cases` (truyền `id` để lấy chi tiết 1 TC) |
+| Phân tích / tách / chuẩn hóa đặc tả | Mô hình dữ liệu + plan + test case | `list_documents(kind="erd")` → `read_document`; `list_plan_items`; `list_test_cases` (truyền `id` để lấy chi tiết 1 TC) |
 | Hiểu / đánh giá UI–UX | Thiết kế Figma | `figma_get_file`, `figma_get_components`, `figma_get_styles`, `figma_export_images` → `read_image` |
 | Đánh giá ảnh hưởng / liên hệ code / implement | Code | `code_query` (theo concept), `code_context` (360° một symbol), `code_impact` (blast radius), `code_route_map` (luồng route/API) |
-| Trạng thái công việc / tiến độ | Plan, module, task, **epic** | `list_plans`, `list_modules`, `list_tasks` — truyền `id` cho `list_plans`/`list_tasks` để lấy chi tiết 1 mục. `query_epics(projectCode, status="live")` để liệt initiative đang chạy; `query_epics(epicId)` GET mode kèm `task_stats` breakdown. Xem `fare-mcp-integration` để phân biệt Epic ≠ Module ≠ Campaign. |
+| Trạng thái công việc / tiến độ | Plan, plan item (theme/epic/story), task | `list_plans`, `list_plan_items`, `list_tasks` — truyền `id` cho `list_plans`/`list_tasks` để lấy chi tiết 1 mục. Muốn liệt kê epic của project: `list_plan_items(projectCode)` rồi lọc `type="epic"`. Muốn task thuộc một epic: `list_tasks(projectCode, plan_item_ids=[<epicId>], include_descendants=true)`. Cây WBS là plan item 3 cấp `theme › epic › story` — xem `fare-mcp-integration`. |
 | Hiểu ảnh nhúng trong tài liệu | Ảnh | `read_document` trả sẵn `imageSummaries`; thiếu thì `read_image` |
 
 Tìm theo khái niệm khi chưa biết tên chính xác: `search_rag(query)`. Tra một thực thể đã biết tên: `search_rag(entity_name)`.

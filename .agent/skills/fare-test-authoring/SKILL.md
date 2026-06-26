@@ -5,7 +5,7 @@ description: Viết test case (TC) trên FARE từ spec đã có — mỗi AC c�
 
 # fare-test-authoring — Viết test case từ spec
 
-Dùng khi: spec đã có (UC / US / SRS gắn `module_id`) cần TC chi tiết để chạy verify; hoặc PM bàn giao task `type=TEST` cần QA viết TC trước khi chạy.
+Dùng khi: spec đã có (UC / US / SRS gắn `plan_item_id`) cần TC chi tiết để chạy verify; hoặc PM bàn giao task `type=TEST` cần QA viết TC trước khi chạy.
 
 KHÔNG thuộc skill này: chạy verify TC (→ `fare-test-execution`); báo bug khi fail (→ `fare-bug-reporting`); sửa spec (→ BA); tạo task TASK/BUG khi không liên quan TC (→ PM).
 
@@ -19,7 +19,7 @@ KHÔNG thuộc skill này: chạy verify TC (→ `fare-test-execution`); báo bu
 Hỏi & CHỜ:
 - **Spec mục tiêu:** id US / UC / SRS cụ thể. Hoặc id task `type=TEST` từ PM → tra ngược URI spec trong description.
 - **Phạm vi coverage:** *full* (mọi AC + boundary + negative) · *smoke* (chỉ positive flow chính) · *regression* (chỉ AC bị động bởi change-request). Hỏi User.
-- **Doc test_case container:** dùng doc đã có (`list_documents(kind="test_case", module_id=<function>)`) hay tạo mới? Mặc định: 1 doc test_case / 1 function — kiểm trùng trước.
+- **Doc test_case container:** dùng doc đã có (`list_documents(kind="test_case", plan_item_id=<function>)`) hay tạo mới? Mặc định: 1 doc test_case / 1 function — kiểm trùng trước.
 
 Đọc spec (paginated tới hết):
 - `read_document(id)` — US → `stories[].acceptance_criteria[]`; UC → `flows[]` (main/alt/exception); SRS → bảng FR/NFR.
@@ -85,13 +85,13 @@ Description PHẢI có ≥1 URI spec — KHÔNG để rỗng (vi phạm §4).
 
 ## Bước 3 — Đảm bảo có doc test_case container
 
-`list_documents(projectCode, kind="test_case", module_id=<function id>)`:
+`list_documents(projectCode, kind="test_case", plan_item_id=<function id>)`:
 - **Đã có doc test_case cho function này** → dùng `document_id` đó. KHÔNG tạo trùng.
 - **Chưa có** → đề xuất + **CHỜ User chốt** (§2):
   ```
-  Tạo doc test_case: title="TC - {Tên function}", module_id=<function>, status=draft
+  Tạo doc test_case: title="TC - {Tên function}", plan_item_id=<function>, status=draft
   ```
-  Sau khi User chốt → `create_document(doc_type="test_case", title=..., module_id=..., content=[])` với content array rỗng (TC thêm sau qua `create_test_cases`).
+  Sau khi User chốt → `create_document(doc_type="test_case", title=..., plan_item_id=..., content=[])` với content array rỗng (TC thêm sau qua `create_test_cases`).
 
 ## Bước 4 — Trình ma trận nháp + CHỜ User chốt
 
@@ -109,7 +109,7 @@ User chốt / sửa → mới batch tạo.
 
 ## Bước 5 — Batch tạo TC
 
-**Một** lời gọi `create_test_cases(projectCode, test_cases=[<mảng>])` (rule §4 — KHÔNG vòng lặp `create_test_case`):
+**Một** lời gọi `create_test_cases(projectCode, test_cases=[<mảng>])` (rule §4 — KHÔNG gọi từng cái trong vòng lặp):
 ```json
 {
   "projectCode": "FARE",
@@ -149,7 +149,7 @@ Báo gọn:
 - ❌ 1 TC kiểm nhiều AC cùng lúc — khó truy nguồn khi fail.
 - ❌ `expected_result` mơ hồ ("hệ thống hoạt động đúng", "OK") — không kiểm chứng được.
 - ❌ `steps` chỉ có "test login" — phải chia thành bước thao tác cụ thể.
-- ❌ Gọi `create_test_case` (số ít) vòng lặp — phải `create_test_cases` batch (§4).
+- ❌ Tạo TC bằng vòng lặp từng cái — phải `create_test_cases` batch (§4), không có biến thể số ít.
 - ❌ Tự set `status="ready"` khi tạo — mặc định `draft`, ready là quyết định QA-lead / User.
 - ❌ TC không URI spec trong description — không truy ngược được AC khi review.
 - ❌ Dùng `type="edge_case"` — sai enum, đã đổi thành `error_guessing`.

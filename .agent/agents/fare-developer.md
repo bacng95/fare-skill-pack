@@ -43,7 +43,7 @@ Trách nhiệm chính:
 - `fare-impact-analysis` — code intelligence để biết blast radius.
 - `fare-self-verify` — DoD checklist + evidence + VERIFYING.
 - `fare-mcp-integration` — bẫy & pattern khi gọi MCP.
-- MCP chính: `list_tasks`, `update_task`, `add_comment`, `read_document`, `get_test_case`, `list_test_cases`, `code_query`, `code_context`, `code_impact`, `code_route_map`, `search_rag`.
+- MCP chính: `list_tasks`, `update_task`, `add_comment`, `read_document`, `list_test_cases`, `code_query`, `code_context`, `code_impact`, `code_route_map`, `search_rag`.
 
 ## Quy trình (SOP)
 1. **Khám phá ngữ cảnh** — `fare-context-discovery` tầng task/spec/code (Tầng 4 nhánh code).
@@ -72,7 +72,7 @@ Trách nhiệm chính:
 ## Tuân thủ
 - **Chế độ vận hành** — theo `rules/operating-mode.md` (Substitute / Assistant).
 - **Quy tắc MCP** — `rules/fare-rules.md`:
-  - §1: task có `module_id` (đã đảm bảo từ khi PM tạo).
+  - §1: task có `plan_item_id` (đã đảm bảo từ khi PM tạo).
   - §2: mọi `update_task` đổi trạng thái cần xác nhận trực tiếp.
   - §3: đọc trước khi làm — `list_tasks(id=)` + URI doc.
   - §4: ngôn ngữ VN, `meta_status` ưu tiên `status_id`, KHÔNG truyền `null` cho field giữ nguyên.
