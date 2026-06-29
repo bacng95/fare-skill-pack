@@ -8,7 +8,7 @@ description: Tách một tài liệu nguyên khối thành nhiều tài liệu F
 Dùng khi có một tài liệu nguồn nguyên khối (nhiều mục đánh số 1.1, 1.2…) cần tách thành nhiều tài liệu FARE.
 
 ## Tiền đề
-- Đã có **Bản đồ ngữ cảnh** (folder / module hiện có, ERD, tài liệu anh em). Nếu đã chạy `fare-context-discovery` ở bước trước trong phiên → dùng lại, KHÔNG chạy lại.
+- Đã có **Bản đồ ngữ cảnh** (folder / cây plan item hiện có, ERD, tài liệu anh em). Nếu đã chạy `fare-context-discovery` ở bước trước trong phiên → dùng lại, KHÔNG chạy lại.
 - Tuân `rules/fare-rules.md` — đặc biệt §7 Content Fidelity, §2 Confirmation Gate, §8, §9.
 
 ## ⚠️ Nguyên tắc tối cao: TRUNG THỰC (§7)
@@ -98,9 +98,9 @@ Nháp lúc này còn **form thô** (bảng HTML từ nguồn) — bình thườn
 Chỉ làm khi User đã duyệt nháp VÀ ra lệnh đẩy.
 
 1. **Xem cấu trúc FARE hiện có.** Đọc resource `fare://projects/{code}/knowledge-tree` — trả cây đầy đủ: `custom_documents` (các folder kèm `id`/`parent_id`/`documents`), `project_documents`, `module_documents` (doc gắn plan item). FARE KHÔNG có tool riêng liệt kê folder — cấu trúc nằm trong resource này.
-2. **Đặt theo cách project ĐÃ tổ chức tài liệu tương tự — KHÔNG mặc định.** Soi cây: một bộ tách trước đó (vd các mục "2.x") đang nằm đâu, gom theo kiểu gì → làm theo đúng kiểu đó. Tài liệu FARE có thể ở folder Custom / Project / gắn Module — chọn theo cấu trúc sẵn có; KHÔNG mặc định folder của tài liệu nguồn, cũng KHÔNG mặc định Module.
-3. **Đề xuất + CHỜ User chốt** (`fare-rules §2`): trình bày cấu trúc liên quan (rút gọn) + đề xuất vị trí cho cả bộ doc (kể cả tạo folder Custom mới nếu mô phỏng bộ tách trước) + lý do. KHÔNG `create_document` khi User chưa chốt. KHÔNG tự tạo Module / Function (xem Phạm vi).
-4. **Tạo.** `create_document` từng file, `status="draft"`, đặt đúng vị trí đã chốt — cơ chế `folder_id` / `plan_item_id` / `path`: xem `fare-mcp-integration`.
+2. **Đặt theo cách project ĐÃ tổ chức tài liệu tương tự — KHÔNG mặc định.** Soi cây: một bộ tách trước đó (vd các mục "2.x") đang nằm đâu, gom theo kiểu gì → làm theo đúng kiểu đó. Tài liệu FARE có thể ở folder Custom / Project / gắn plan item (Module Documents) — chọn theo cấu trúc sẵn có; KHÔNG mặc định folder của tài liệu nguồn, cũng KHÔNG mặc định gắn plan item.
+3. **Đề xuất + CHỜ User chốt** (`fare-rules §2`): trình bày cấu trúc liên quan (rút gọn) + đề xuất vị trí cho cả bộ doc (kể cả tạo folder Custom mới nếu mô phỏng bộ tách trước) + lý do. KHÔNG `create_document` khi User chưa chốt. KHÔNG tự tạo plan item — theme / epic / story (xem Phạm vi).
+4. **Tạo.** `create_document` từng file (doc mặc định `draft` — KHÔNG truyền param `status`, create không nhận), đặt đúng vị trí đã chốt — cơ chế `folder_id` / `plan_item_id` / `path`: xem `fare-mcp-integration`.
 5. **Nối link** = **chip mention**, KHÔNG dùng markdown link. Sau khi mọi doc có ID, nâng `{số} {tên}` →
    ```html
    <a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">{số} {tên}</a>
@@ -127,5 +127,5 @@ Chỉ làm khi User đã duyệt nháp VÀ ra lệnh đẩy.
 - [ ] Cross-ref mọi dạng (số trần / "(Mục X.Y)" / số lạ) → `{số} {tên}`; không phân giải được → giữ `{số}` + ghi **sổ phát hiện** (KHÔNG `⚠️` trong thân).
 - [ ] Suy luận / lỗi nguồn / điểm mở / markup biên tập đều nằm trong **sổ phát hiện** ngoài luồng và đã báo User — KHÔNG trong thân nháp.
 - [ ] Đã nháp local + chờ User duyệt TRƯỚC khi đẩy FARE.
-- [ ] Vị trí đẩy lên FARE: đã đọc `knowledge-tree`, đặt theo cách project tổ chức tài liệu tương tự + User chốt — KHÔNG mặc định folder nguồn, cũng không mặc định Module.
-- [ ] Không doc nào set `approved`; không tự tạo module / folder.
+- [ ] Vị trí đẩy lên FARE: đã đọc `knowledge-tree`, đặt theo cách project tổ chức tài liệu tương tự + User chốt — KHÔNG mặc định folder nguồn, cũng không mặc định gắn plan item.
+- [ ] Không doc nào set `approved`; không tự tạo plan item / folder.

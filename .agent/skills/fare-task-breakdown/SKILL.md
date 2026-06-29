@@ -87,15 +87,15 @@ Khai báo qua `links: [{ target_task_id, link_type: "blocks" }]` — NHƯNG `tar
 
 ### Nguyên tắc
 - `task.est_effort` đơn vị **GIỜ** (decimal: 0.5 = 30 phút, 8 = 1 ngày công). KHÁC `story.effort` (plan item) đơn vị MAN-DAYS.
-- **Bottom-up:** ước MỖI task từ đặc điểm task đó (lượng code thật, validate, integration, test). KHÔNG chia story effort theo tỷ trọng layer (sai phương pháp — story.effort_est là *judgment cấp cao*, không phản ánh task chi tiết).
-- **Story.effort_est là CEILING SANITY-CHECK** (Bước 3.3), KHÔNG phải input để chia.
+- **Bottom-up:** ước MỖI task từ đặc điểm task đó (lượng code thật, validate, integration, test). KHÔNG chia story effort theo tỷ trọng layer (sai phương pháp — story.effort là *judgment cấp cao* suy từ matrix complexity/scope/clarity, không phản ánh task chi tiết).
+- **Story.effort là CEILING SANITY-CHECK** (Bước 3.3), KHÔNG phải input để chia. (Lưu ý: story dùng `effort` matrix-derived; `effort_est` là của EPIC — story luôn null.)
 - User là người chốt số cuối — agent đề xuất *khoảng* dựa heuristic, KHÔNG gán cứng.
 
 ### 3.0 — Lấy 3 mẩu data ngữ cảnh từ FARE (đọc TRƯỚC khi nháp)
 
 | Cần | Resource | Dùng làm gì |
 |---|---|---|
-| `hours_per_day` của project | `fare://projects/{code}` → field `hours_per_day` | Quy đổi `story.effort_est` (man-days) → giờ ở Bước 3.3 |
+| `hours_per_day` của project | `fare://projects/{code}` → field `hours_per_day` | Quy đổi `story.effort` (man-days) → giờ ở Bước 3.3 |
 | Task hiện có trong story này | `fare://plan-items/{story_id}/task-effort-summary` → `total.sum_est_hours` + `total.count` | Biết story đã có bao nhiêu task + effort đang chiếm → chỉ ước phần *còn lại*, không double-count |
 | Velocity team (auto-calibrate factor) | `fare://projects/{code}/velocity` → `window_90d.median` (ưu tiên) hoặc `window_30d.median` (current) | Hiệu chỉnh factor heuristic theo lịch sử team: nếu median > 1.0 → team thường ước thấp → nhân `est_effort` thêm factor `velocity_median` |
 
@@ -175,16 +175,16 @@ User có thể chỉnh thủ công bất kỳ task nào — nếu chỉnh > 2× 
 
 ### 3.3 — Ceiling check (sau khi mỗi task có est)
 
-Sum `task.est_effort` (mọi task vừa nháp) **cộng với task đã có** từ Bước 3.0 (`task-effort-summary.total.sum_est_hours`) → đối chiếu với `story.effort_est` quy hours.
+Sum `task.est_effort` (mọi task vừa nháp) **cộng với task đã có** từ Bước 3.0 (`task-effort-summary.total.sum_est_hours`) → đối chiếu với `story.effort` quy hours.
 
 **Quy đổi man-days → hours:**
 - `hours_per_day` đã đọc ở Bước 3.0 từ `fare://projects/{code}`. Default 8 nếu null.
 
 **Tính ratio:**
 ```
-ratio = (sum_new_task_est + summary.total.sum_est_hours) / (story.effort_est × hours_per_day)
+ratio = (sum_new_task_est + summary.total.sum_est_hours) / (story.effort × hours_per_day)
 ```
-Nếu `story.effort_est = 0` (chưa estimate) → bỏ ceiling check, báo PM chạy `fare-effort-estimation` ngược sau breakdown (input sum tasks làm sanity).
+Nếu `story.effort = 0` (story chưa gán complexity/scope/clarity) → bỏ ceiling check, báo PM chạy `fare-effort-estimation` ngược sau breakdown (input sum tasks làm sanity).
 
 **Thang mức vượt → số phương án đề xuất:**
 
@@ -193,14 +193,14 @@ Nếu `story.effort_est = 0` (chưa estimate) → bỏ ceiling check, báo PM ch
 | **< 0.8** | 🟩 Dư buffer | (a) Chấp nhận, giữ buffer · (b) Thêm 1 task buffer (refactor / doc / monitoring) tận dụng capacity sprint |
 | **0.8 – 1.1** | 🟩 Khớp tốt | Báo OK, không cần đề xuất gì. |
 | **1.1 – 1.25** | 🟨 Vượt nhẹ | (a) Chấp nhận overrun + note lý do · (b) Trim scope nhẹ 1 task không critical |
-| **1.25 – 1.5** | 🟧 Vượt trung | + (c) Re-estimate story effort_est (BA/PM `/fare-pm`) · (d) Defer 1 task qua sprint sau |
+| **1.25 – 1.5** | 🟧 Vượt trung | + (c) Re-estimate story effort qua chỉnh complexity/scope/clarity (`fare-effort-estimation`, route `/fare-pm`) · (d) Defer 1 task qua sprint sau |
 | **1.5 – 2.0** | 🟥 Vượt nhiều | + (e) Chia thêm task để parallel (gán nhiều assignee) · (f) Split story thành 2 (BA reassess scope qua `/fare-change`) |
 | **> 2.0** | 🟥🟥 NGHIÊM TRỌNG | Cảnh báo: spec / scope có vấn đề. DỪNG breakdown. Bàn giao BA `/fare-change` re-spec hoặc `/fare-audit-spec`; PM `/fare-pm` re-plan toàn story. KHÔNG batch task. |
 
 **Mẫu báo cáo cho tier > 0.8 ceiling:**
 ```
 ## Ceiling check
-Story "Thêm nhân viên" (id=120): effort_est = 5 md × hours_per_day=8 = 40h
+Story "Thêm nhân viên" (id=120): effort = 5 md × hours_per_day=8 = 40h
 Task hiện có trong story (từ task-effort-summary): 2 task, sum_est = 8h
 Sum task mới (5 task): 44h
 Tổng sau breakdown: 52h
@@ -209,17 +209,17 @@ Ratio: 52 / 40 = 1.30 → 🟧 Vượt trung (25–50%)
 Phương án đề xuất:
 (a) Chấp nhận overrun 12h, note "validate phức tạp hơn ước ban đầu" vào description.
 (b) Trim TASK-5 [Infra] (4h, không critical sprint này) → còn 48h, ratio 1.20.
-(c) Re-estimate story effort_est từ 5 md lên 7 md (BA/PM /fare-pm).
+(c) Re-estimate story effort từ 5 md lên 7 md (chỉnh complexity/scope/clarity qua fare-effort-estimation, route /fare-pm).
 (d) Defer TASK-5 qua sprint sau.
 
 Đánh giá theo tình hình:
 Validate phức tạp là phát hiện chính đáng khi đọc spec sâu. (c) hợp lý nhất —
-ước ban đầu quá lạc quan, sửa effort_est sẽ giúp velocity team chính xác hơn về sau.
+ước ban đầu quá lạc quan, sửa effort story (qua attributes) sẽ giúp velocity team chính xác hơn về sau.
 (b) nguy hiểm vì infra cuối cùng cũng phải làm. (a)/(d) chỉ giấu vấn đề.
 Đề xuất chính: (c). User chốt?
 ```
 
-**Khi story CHƯA có `effort_est`** (BA-light không estimate): bỏ ceiling check, vẫn bottom-up từng task. Báo PM: sau breakdown có thể chạy `fare-effort-estimation` ngược (input sum_task_est làm sanity-check cho story).
+**Khi story CHƯA có `effort`** (BA-light không estimate / chưa gán complexity·scope·clarity): bỏ ceiling check, vẫn bottom-up từng task. Báo PM: sau breakdown có thể chạy `fare-effort-estimation` ngược (input sum_task_est làm sanity-check cho story).
 
 ### 3.5 — Sau khi User chốt batch task
 
@@ -258,9 +258,9 @@ Sau khi batch trả về với id của từng task → gọi `update_task(add_l
 ## Bước 5 — Báo cáo & bàn giao
 
 Báo gọn:
-- Đã tạo N task — liệt kê id + title + URL.
+- Đã tạo N task — trình bảng **mã task (vd FC-188) + title + vị trí** (`Module: {tên story} ({code story})`), KHÔNG liệt kê id trần (rule §4 — User tra mã task trên UI).
 - Task nào chưa có spec đầy đủ → đánh dấu cần BA bổ sung.
-- Task type=TEST → bàn giao QA (khi vai QA có) viết TC chi tiết.
+- Task type=TEST → bàn giao QA `/fare-test` viết TC chi tiết.
 - Task BE/FE → sẵn cho Dev pickup. Trạng thái mặc định `TODO`.
 
 KHÔNG tự assign owner trừ khi User chỉ định rõ — assignee thường do team tự pickup.
@@ -273,8 +273,8 @@ KHÔNG tự assign owner trừ khi User chỉ định rõ — assignee thường
 - ❌ Description không URI doc — dev không biết tham chiếu spec nào.
 - ❌ Tạo task từng cái trong vòng lặp — phải `create_tasks` batch một lần (§4).
 - ❌ Tự set `meta_status="DONE"` ngay khi tạo — task mới luôn TODO (§6).
-- ❌ Truyền nhầm `est_effort` man-days vào task (task là GIỜ, module là MAN-DAYS).
-- ❌ **Chia `story.effort_est` theo tỷ trọng layer** rồi gán xuống task (top-down). Phải bottom-up từng task theo bản chất task; story effort chỉ là ceiling sanity-check.
+- ❌ Truyền nhầm `est_effort` man-days vào task (task là GIỜ, story là MAN-DAYS).
+- ❌ **Chia `story.effort` theo tỷ trọng layer** rồi gán xuống task (top-down). Phải bottom-up từng task theo bản chất task; story effort chỉ là ceiling sanity-check.
 - ❌ Gán `est_effort` cứng từ bảng base mà KHÔNG nhân factor AI level × Dev level.
 - ❌ Ép sum tasks khớp ceiling (giảm task effort xuống chỉ để khớp story effort) — giấu vấn đề, sẽ overrun thật trong sprint.
 - ❌ Bỏ qua ceiling check (>0.8 ratio) — không báo User để chốt phương án xử lý.

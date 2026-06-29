@@ -43,7 +43,7 @@ Truyền field lệch cấp (vd `complexity` cho epic, hay `effort_est_level` ch
 | story `effort` | **Man-days** | Story | **Auto** — FARE tính từ FP_score qua `fare://effort-matrix`. KHÔNG set tay. |
 | epic `effort_est` | **Man-days** | Epic | **Dẫn xuất** từ `effort_est_level` (L1-L4). KHÔNG set trực tiếp. |
 | `task.est_effort` | **GIỜ** (decimal, 0.5 = 30 phút, 8 = 1 ngày công) | Task | Manual — PM hoặc Dev điền. |
-| `task.actual_effort` | **GIỜ** | Task | Manual — Dev điền sau khi làm xong, đối chiếu est. |
+| `task.actual_effort` | **GIỜ** | Task | Dev điền qua **worklog trên UI FARE** sau khi làm xong — KHÔNG set được qua MCP (`update_task` không có field này). |
 
 Nhầm man-days ↔ giờ trên cùng project = số liệu effort vô nghĩa. Mỗi lần truyền số → tự hỏi: "đây là task hay plan item?"
 

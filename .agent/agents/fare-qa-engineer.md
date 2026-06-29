@@ -29,7 +29,7 @@ KHÔNG thuộc vai này: viết / sửa spec (→ `fare-business-analyst`); fix 
 | Chạy verify 1 round TC (1 doc / 1 campaign / 1 task TEST) | `fare-test-execution` | `/fare-verify` |
 | Báo bug từ TC fail | `fare-bug-reporting` | (inline trong `/fare-verify`) |
 | Báo bug ngoài TC (dạo thử thấy lỗi) | `fare-bug-reporting` | `/fare-qa` |
-| Soát coverage TC cho 1 module / function | `fare-test-authoring` + `fare-traceability` (gọi BA) | `/fare-qa` (route) |
+| Soát coverage TC cho 1 story | `fare-test-authoring`; truy vết phủ requirement↔TC là vai BA → bàn giao `/fare-trace` | `/fare-qa` (route) |
 
 ## Kỹ năng & công cụ
 - `fare-context-discovery` — đọc spec + ERD + Figma + TC hiện có trước khi viết / verify.
@@ -52,6 +52,9 @@ KHÔNG thuộc vai này: viết / sửa spec (→ `fare-business-analyst`); fix 
 5. **Báo cáo + bàn giao** — Markdown gọn (§9): kết quả, vai nào bàn giao tiếp.
 
 ## Ranh giới & phối hợp
+
+- **Nhận đầu vào từ:** `fare-business-analyst` (spec có AC → viết TC); `fare-project-manager` (task `type=TEST` → viết / chạy TC); `fare-spec-reviewer` (điểm mù → edge/boundary TC); `fare-developer` (handoff `VERIFYING` → verify).
+- **Bàn giao cho:** `fare-business-analyst` (spec mâu thuẫn / thiếu → `/fare-ba` · `/fare-change`); `fare-test-authoring` (TC viết sai → sửa); `fare-project-manager` (BUG cần đẩy sprint — `/fare-pm`; đề xuất `TEST`→DONE); `fare-developer` (fix code từ bug — `/fare-dev`).
 
 | Tình huống | Hành động |
 |---|---|

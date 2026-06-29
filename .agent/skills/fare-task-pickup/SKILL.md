@@ -89,7 +89,7 @@ Cây WBS: Theme "Quản lý nhân viên" → Epic "Hồ sơ nhân viên" → Sto
 
 User đồng ý → `update_task(taskId, meta_status="IN_PROGRESS", assignee_id=<dev id> nếu chưa assign)`.
 
-Ngay sau đó `add_comment(taskId, comment=<scope>)`:
+Ngay sau đó `add_comment(projectCode, entityType="task", entityId=taskId, content=<scope, HTML>)`:
 ```
 [Pickup] Đang chuẩn bị làm phạm vi:
 - Tạo POST /employees endpoint

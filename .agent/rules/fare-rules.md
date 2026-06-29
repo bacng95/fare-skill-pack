@@ -54,6 +54,12 @@ Ngoại lệ: nếu User đã phát lệnh trực tiếp đúng hành động đ
   - Viết bằng **tiếng Việt**, ngắn gọn, dễ hiểu, gợi rõ chức năng/nhiệm vụ liên quan (ví dụ tốt: `"Sửa luồng đăng nhập SSO khi token hết hạn"`; ví dụ kém: `"Fix bug auth"` hoặc `"Task 1"`).
   - `description` phải đủ chi tiết: bối cảnh, hành vi mong đợi, Acceptance Criteria (nếu là task feature) hoặc Steps to Reproduce + Expected vs Actual (nếu là BUG).
   - **Đính kèm URI tài liệu liên quan** trong description theo định dạng `fare://documents/{id}` (User Story, API Doc, ERD, Use Case, audit doc...). Nếu chưa có document, ghi rõ "tài liệu sẽ bổ sung sau" — không để trống reference.
+- **Báo cáo artifact đã tạo — phải ĐỊNH VỊ được trên UI:** khi báo cho User một tài liệu / task vừa tạo hay cập nhật, KHÔNG trả URI trần `fare://documents/{id}` (User nhìn id không biết là gì, không tìm được trên UI). LUÔN kèm đủ:
+  - **Tiêu đề** đầy đủ của artifact.
+  - **Breadcrumb vị trí** dạng `Project {code} › <phân vùng> › {tiêu đề}`, trong đó *phân vùng* là một trong: `Module: {tên plan item} ({code plan item})` (doc/task gắn `plan_item_id`) · `Project Documents` (scope=project) · `Custom › {đường dẫn folder}` (scope=custom). Agent biết các giá trị này vì chính nó vừa chọn vị trí khi tạo.
+  - Với **task**: kèm **mã task** (vd `FC-188`) — đây là thứ User tra trực tiếp trên UI; id số là phụ.
+  - (Tùy chọn) đường mở nhanh `/docs/{id}` (doc) — nếu biết base URL FARE thì ghi link đầy đủ.
+  - Khi tạo hàng loạt: trình bảng `mã/tiêu đề · vị trí` để User quét nhanh, KHÔNG liệt kê id trần.
 
 ## 5. 🤝 Socratic Gate & Bug Discovery (Chốt chặn Socratic & Khi phát hiện bug)
 - Bất kỳ yêu cầu tạo mới Tính năng / Requirement nào cũng phải đi qua **Socratic Gate**.

@@ -13,7 +13,7 @@ description: Sau khi dev code xong, self-verify đối chiếu DoD + TC linked, 
 ## Luồng
 1. Kích hoạt agent `fare-developer`.
 2. Xác định **chế độ vận hành** (`rules/operating-mode.md`) nếu ngữ cảnh chưa rõ.
-3. Agent chạy SOP: đọc lại DoD + TC linked → self-checklist (DoD / TC / impact recheck / spec contract) → gom evidence (commit, branch, file) → trình tóm tắt → **CHỜ User chốt** → `update_task(meta_status="VERIFYING", actual_effort=<giờ>)` + `add_comment` evidence → bàn giao QA.
+3. Agent chạy SOP: đọc lại DoD + TC linked → self-checklist (DoD / TC / impact recheck / spec contract) → gom evidence (commit, branch, file) → trình tóm tắt → **CHỜ User chốt** → `update_task(meta_status="VERIFYING")` (giờ thực tế ghi qua worklog UI, KHÔNG qua MCP) + `add_comment` evidence → bàn giao QA.
 
 ## Tiền đề CỨNG
 - Task đang `IN_PROGRESS` của dev.

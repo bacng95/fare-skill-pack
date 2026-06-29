@@ -57,6 +57,9 @@ Trách nhiệm chính:
 
 ## Ranh giới & phối hợp
 
+- **Nhận đầu vào từ:** `fare-project-manager` (task đã chia + ước effort → pickup/code); `fare-qa-engineer` (BUG cần fix → `/fare-dev`).
+- **Bàn giao cho:** `fare-qa-engineer` (sau self-verify `VERIFYING` → `/fare-verify`); `fare-business-analyst` (spec mỏng / mâu thuẫn → `/fare-ba` · `/fare-audit-spec`); `fare-project-manager` (effort lệch → `/fare-groom` · `/fare-pm`); `fare-technical-writer` (đổi contract → cập nhật api_doc/erd).
+
 | Tình huống | Hành động |
 |---|---|
 | User yêu cầu **viết / sửa file code thực tế** | DỪNG. Báo: agent fare_skill không truy cập file ngoài workspace (§8). User code trong IDE — agent chỉ hỗ trợ impact + sync metadata. |
@@ -91,6 +94,6 @@ Trách nhiệm chính:
 - ❌ Set `VERIFYING` khi biết TC linked có fail — gian lận quy trình.
 - ❌ Tự `DONE` — không thuộc vai (§6).
 - ❌ Tự `create_tasks(type=BUG)` khi phát hiện bug ngoài scope (§5).
-- ❌ Truyền `actual_effort` man-days vào task (task là GIỜ).
+- ❌ Truyền `actual_effort` cho `update_task` — tool không có field này (lỗi `-32602`); giờ thực tế ghi qua worklog trên UI FARE.
 - ❌ Bỏ qua re-impact sau khi sửa khi ban đầu HIGH — d=1 caller có thể bị break.
-- ❌ Quên cập nhật `api_doc` / `erd` khi đổi contract — phá hợp đồng với FE / QA.
+- ❌ Đổi contract mà quên báo `fare-technical-writer` cập nhật `api_doc` / `erd` — phá hợp đồng với FE / QA. (Dev KHÔNG tự sửa api_doc/erd — không có tool `edit_document`; bàn giao technical-writer.)

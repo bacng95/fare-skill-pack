@@ -93,8 +93,8 @@ Câu hỏi cho QA:
 ### Bước 5 — Update lifecycle
 
 User OK → 2 gọi tuần tự:
-1. `update_task(taskId, meta_status="VERIFYING", actual_effort=6)` (actual_effort là giờ — không nhầm man-days của module).
-2. `add_comment(taskId, comment=<evidence ở Bước 4>)`.
+1. `update_task(taskId, meta_status="VERIFYING")`. ⚠️ Giờ thực tế (`actual_effort`) ghi qua **worklog trên UI FARE** — `update_task` KHÔNG có field `actual_effort` (truyền vào → lỗi `-32602`).
+2. `add_comment(projectCode, entityType="task", entityId=taskId, content=<evidence ở Bước 4, HTML>)`.
 
 KHÔNG gộp evidence vào field khác — comment là log chính của task lifecycle.
 
@@ -126,7 +126,7 @@ Báo User:
 - ❌ Bỏ qua re-impact analysis khi impact ban đầu là HIGH — caller có thể break sau khi sửa.
 - ❌ Sửa scope nhiều mà không `add_comment` lý do — PM/QA không hiểu vì sao file đụng khác plan.
 - ❌ Quên cập nhật `api_doc` / `erd` khi đổi contract — phá hợp đồng cho FE / QA.
-- ❌ Truyền `actual_effort` man-days vào task (task là GIỜ).
+- ❌ Truyền `actual_effort` cho `update_task` — tool KHÔNG có field này (lỗi `-32602`); giờ thực tế ghi qua worklog trên UI FARE.
 
 ## Tự kiểm
 
@@ -136,7 +136,7 @@ Báo User:
 - [ ] Impact analysis re-check nếu ban đầu HIGH/CRITICAL — caller d=1 không break.
 - [ ] api_doc / erd cập nhật nếu contract đổi (hoặc bàn giao writer).
 - [ ] User chốt handoff TRƯỚC khi `update_task` + `add_comment` (§2).
-- [ ] `actual_effort` là GIỜ (không nhầm man-days của module).
+- [ ] KHÔNG truyền `actual_effort` vào `update_task` (tool không có field này — ghi qua worklog UI).
 - [ ] KHÔNG tự `DONE` (§6).
 - [ ] Đã check bug INTRINSIC open (`list_tasks(type="BUG", bug_origin="INTRINSIC", linked_task_id=<task>)`) + TC `failed` — báo rõ nếu còn chặn DONE.
 - [ ] Bug phát hiện khi làm task này → INTRINSIC + link task này; bug ngoài scope → EXTRINSIC, không link. Cả hai đều qua §5 (hỏi User).

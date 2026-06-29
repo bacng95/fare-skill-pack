@@ -65,12 +65,12 @@ Báo cáo `## Impact Assessment` — nhóm theo mức rủi ro 🟥/🟧/🟨 (t
     | yyyy-mm-dd | vN→vN+1 | {tóm tắt diff theo bullet}              | {nguồn ở Bước 1}      |
     ```
   - Structured: nếu schema không có chỗ → ghi log vào 1 `add_comment` của doc (description gắn URI yêu cầu thay đổi).
-- **Status:** giữ `draft` (hoặc `in_review` nếu User yêu cầu gửi soát). **KHÔNG `approved`** (§7).
+- **Status:** giữ `draft` (hoặc `review` qua `update_document(status="review")` nếu User yêu cầu gửi soát). **KHÔNG `approved`** (§7).
 - **Publish / bump version:** việc của User — KHÔNG tự gọi tool publish.
 
 ### Sau Bước 5 — Bàn giao downstream
 - UC/US bị đổi flows/AC → đề xuất `fare-spec-reviewer` soát lại blind spot.
-- Test case bị ảnh hưởng → đề xuất bàn giao QA cập nhật (khi vai QA có).
+- Test case bị ảnh hưởng → đề xuất bàn giao QA `/fare-test` cập nhật.
 - Task downstream `DONE` mà spec đổi sau khi code → đề xuất tạo task BUG / re-verify (NHƯNG theo rule §5: chỉ tạo BUG sau khi User xác nhận).
 - **Nhánh epic bị ảnh hưởng** → nếu thay đổi đụng nhiều story dưới cùng epic → bàn giao PM `/fare-pm` xem lại phạm vi / month plan của nhánh đó (`list_tasks(plan_item_ids=[<epicId>], include_descendants=true)` để soát task chịu ảnh hưởng).
 
@@ -89,4 +89,4 @@ Báo cáo `## Impact Assessment` — nhóm theo mức rủi ro 🟥/🟧/🟨 (t
 - [ ] Diff đã được User chốt TRƯỚC khi `edit_document` / `update_document` (§2).
 - [ ] Richtext dùng `edit_document` (block ops); structured gửi FULL JSON qua `edit_document(replace_all)`.
 - [ ] Change log đã ghi (block hoặc comment) — không sửa "lặng".
-- [ ] `status="draft"` hoặc `in_review` — KHÔNG `approved`. Việc publish dành cho User.
+- [ ] `status` ở `draft` hoặc `review` — KHÔNG `approved`. Việc publish dành cho User.

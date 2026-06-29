@@ -32,6 +32,12 @@ Skill này dạy cách dùng **MCP `fare` tools** để dựng đủ ngữ cản
 - Phân trang cắt ngang thẻ HTML/bảng → tự ghép lại; cần ID block ổn định để sửa thì dùng `mode="blocks"`.
 - Artifact khác: `list_tasks(id=<id>)`, `list_test_cases(id=<id>)` — truyền `id` để lấy chi tiết đầy đủ 1 task / test case. Trang mô tả của folder/module: tìm qua `list_documents`.
 
+> **Greenfield — đầu vào là file ngoài / feature CHƯA có trên FARE.** Vai BA thường nhận **file khách (Word/PDF/Excel)** cho một chức năng chưa tồn tại → KHÔNG có artifact mỏ neo để `read_document(id)`, không có `id/kind/status`. Khi đó:
+> - **Đọc file nguồn** bằng skill `docx` / `pdf` / `xlsx` → trích cấu trúc yêu cầu thô (FR, actor, luồng).
+> - **"Mỏ neo" đổi nghĩa thành NƠI feature sẽ đáp xuống:** `list_projects` dò project đích (chưa có project → DỪNG, đề nghị User tạo — xem tiền điều kiện `/fare-ba`); `list_plan_items` kiểm cây xem đã có nhánh theme/epic/story để gắn chưa. Chưa có chỗ gắn → đánh dấu "cần `/fare-plan` dựng cây trước" (rule §1).
+> - **Vẫn chạy Tầng 2–3** (hàng xóm, glossary, ERD anh em) để feature mới không mâu thuẫn / trùng cái đã có.
+> - Xuất **Bản đồ ngữ cảnh — biến thể greenfield** (mẫu cuối file): không có id mỏ neo; thay bằng nguồn file + project đích + nhánh plan dự kiến / "chưa tồn tại".
+
 ### Tầng 2 — Hàng xóm & cấu trúc
 - `list_documents(projectCode, scope)` → cây thư mục. Tài liệu anh em cho biết artifact thuộc một *bộ* (vd SRS nhiều module).
 - Đọc tài liệu Preamble / Tổng quan / Glossary anh em để lấy domain, vai trò, thuật ngữ chuẩn.
@@ -83,7 +89,7 @@ Tham chiếu chéo:
 
 Đối chiếu nguồn khác:
 - ERD:        <khớp / lệch — nêu cụ thể trường nào>
-- Plan/module: <đã có breakdown? khớp tài liệu không?>
+- Plan item:   <đã có breakdown cây theme/epic/story? khớp tài liệu không?>
 - Code/Figma:  <nếu có — phát hiện gì>
 
 Khoảng trống & rủi ro: <placeholder trống, mâu thuẫn, điểm mở do comment>
@@ -92,9 +98,29 @@ Khoảng trống & rủi ro: <placeholder trống, mâu thuẫn, điểm mở do
 Cần người xác nhận: <danh sách câu hỏi mở>
 ```
 
+### Biến thể greenfield (đầu vào là file ngoài, chưa có mỏ neo trên FARE)
+```
+## Bản đồ ngữ cảnh: <tên feature> (greenfield)
+
+Nguồn:          file <tên.xlsx/docx/pdf> · <ngày>
+Mỏ neo (đích):  project <code> · nhánh plan dự kiến: <theme/epic/story | CHƯA tồn tại → cần /fare-plan>
+Domain/vai trò: <rút từ file nguồn + glossary FARE nếu có>
+
+Cấu trúc yêu cầu thô (từ file):
+- FR-xxx <mô tả> ...
+
+Đối chiếu cái đã có trên FARE:
+- Tài liệu / feature anh em: <trùng / chồng lấn? — nêu cụ thể>
+- ERD / glossary liên quan:  <khớp / lệch>
+
+Khoảng trống & rủi ro: <chưa có project? chưa có chỗ gắn plan_item? mâu thuẫn cái đã có?>
+Độ tin cậy: <cao | vừa | thấp>
+Cần người xác nhận: <...>
+```
+
 ## Tự kiểm trước khi kết thúc
 
-1. Đã đọc hết artifact mỏ neo (không bỏ trang)?
+1. Đã đọc hết artifact mỏ neo (không bỏ trang)? — *greenfield:* đã đọc hết file nguồn + xác định project đích & nhánh plan để gắn (hoặc đánh dấu "cần /fare-plan")?
 2. Đã xem cây thư mục và đọc tài liệu định hướng (Tổng quan/Glossary)?
 3. Mọi tham chiếu chéo đều đã phân giải hoặc được đánh dấu rõ?
 4. Đã đào đúng tầng 4 mà mục tiêu kế tiếp cần (ERD / code / Figma / plan)?

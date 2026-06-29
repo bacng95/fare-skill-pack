@@ -1,12 +1,12 @@
 ---
 name: fare-trace
-description: Xây ma trận truy vết requirement ↔ use_case ↔ user_story ↔ test_case ↔ module ↔ task; phát hiện gap trước khi go-live / bàn giao QA.
+description: Xây ma trận truy vết requirement ↔ use_case ↔ user_story ↔ test_case ↔ plan item (theme/epic/story) ↔ task; phát hiện gap trước khi go-live / bàn giao QA.
 ---
 
 # /fare-trace — Ma trận truy vết & gap
 
-**Việc:** quét phạm vi User chọn (project / module / 1 doc), xâu chuỗi từ yêu cầu nghiệp vụ tới task/test, liệt kê chỗ thiếu phủ.
-**Cú pháp:** `/fare-trace [mã project] [module|doc id?] [forward|backward?]`
+**Việc:** quét phạm vi User chọn (project / plan item / 1 doc), xâu chuỗi từ yêu cầu nghiệp vụ tới task/test, liệt kê chỗ thiếu phủ.
+**Cú pháp:** `/fare-trace [mã project] [plan item id|doc id?] [forward|backward?]`
 **Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-business-analyst` (chạy skill `fare-traceability`).
 
@@ -17,5 +17,5 @@ description: Xây ma trận truy vết requirement ↔ use_case ↔ user_story �
 
 ## Bàn giao
 - Gap loại spec thiếu (🟥/🟧): chuyển `/fare-ba` để bổ sung use_case / user_story.
-- Gap loại test thiếu (🟧): bàn giao QA (khi vai QA được xây).
+- Gap loại test thiếu (🟧): bàn giao QA `/fare-test` viết TC.
 - Gap loại task/link thiếu (🟨): bàn giao PM hoặc dev chạy `update_task`.

@@ -30,7 +30,7 @@ FARE tự mô tả chính nó — luôn đúng theo phiên bản hiện tại:
 | **Plan / Sprint** | `list_plans`, `upsert_plan` | `list_plans(id=..., include=["versions","commits"])` = chi tiết. `upsert_plan` tạo/sửa month plan. KHÔNG có `get_plan`. | <!-- lint:allow -->
 | **Task** | `list_tasks`, `create_tasks`, `update_task`, `delete_task` | `create_tasks` luôn batch (mảng). `list_tasks(id=...)` = chi tiết 1 task. KHÔNG có `create_task` số ít. | <!-- lint:allow -->
 | **Test case** | `list_test_cases`, `create_test_cases`, `update_test_case` | `create_test_cases` luôn batch. `list_test_cases(id=...)` = chi tiết 1 TC. Ghi verify qua `update_test_case(verify={...})`. KHÔNG có `get_test_case`/`create_test_case` số ít. | <!-- lint:allow -->
-| **Comment** | `add_comment`, `get_comments` | entityType ∈ `document\|task\|plan\|campaign`. |
+| **Comment** | `add_comment`, `get_comments` | `add_comment(projectCode, entityType, entityId, content)` — entityType ∈ `document\|task\|plan\|campaign`; `entityId` = id thực thể; **`content` là HTML** (vd `<p>…</p>`), KHÔNG Markdown. KHÔNG có param `taskId`/`comment`. |
 | **RAG / tìm** | `search_rag` | Search NỘI DUNG đã index (`query` HOẶC `entity_name`). Không match tên doc/folder. |
 | **Code intelligence** | `code_repos`, `code_query`, `code_context`, `code_impact`, `code_route_map`, `code_read_file` | Chỉ project đã index repo. Nhiều repo/branch → `code_repos` trước. |
 | **Ảnh** | `read_image`, `upload_image` | |
@@ -72,10 +72,10 @@ Function" hay "Epic initiative độc lập" của bản cũ.
 - `effort` và `effort_est` là **dẫn xuất** — không bao giờ truyền tay.
 
 ## Link nội bộ giữa tài liệu = chip mention (KHÔNG markdown link)
-Trỏ từ nội dung richtext (thân tài liệu, `description` task…) sang tài liệu/folder khác:
-- **Gọn (auto):** ghi **URI trần** `fare://documents/{id}` (hoặc `fare://folders/{id}`) → frontend tự đổi thành **chip bấm được** (nhãn placeholder `Document #{id}`).
-- **Có nhãn đẹp:** ghi **chip HTML đầy đủ** — `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">{nhãn}</a>` (folder → `data-doc-type="folder"`, `href="/docs?folder={id}"`). ⚠️ **Bắt buộc có `data-type="mention"`** — thiếu nó backend chèn thêm 1 chip resolve nữa → **bị nhân đôi**.
-- ⚠️ **KHÔNG** dùng `[{nhãn}](fare://documents/{id})` (markdown link): thiếu `class="fare-mention"` → frontend bỏ qua, không bấm được.
+Hành vi auto-chip **KHÁC nhau theo ngữ cảnh** (đã kiểm round-trip):
+- **Trong `description` task / `add_comment`:** ghi **URI trần** `fare://documents/{id}` là đủ → backend auto-convert thành chip bấm được (mô tả tool `update_task`/`add_comment`: "auto-chip-converted").
+- **Trong THÂN tài liệu richtext (doc body):** URI trần **KHÔNG** tự thành chip — lưu xong vẫn là **text thuần** (đã kiểm doc 619). PHẢI ghi **chip HTML đầy đủ**: `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">{nhãn}</a>` (folder → `data-doc-type="folder"`, `href="/docs?folder={id}"`). ⚠️ **Bắt buộc có `data-type="mention"`** — thiếu nó backend chèn thêm 1 chip resolve → **bị nhân đôi**.
+- ⚠️ **KHÔNG** dùng `[{nhãn}](fare://documents/{id})` (markdown link): bị rút còn text trần, không bấm được (đã kiểm).
 
 ## Bug INTRINSIC ≠ EXTRINSIC (bug nội sinh vs ngoại lai)
 

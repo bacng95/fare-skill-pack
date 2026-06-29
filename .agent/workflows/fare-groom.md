@@ -20,4 +20,4 @@ description: Grooming backlog — quét task lệch trạng thái, bug chưa tri
 ## Bàn giao
 - Bug mới phát hiện cần track → hỏi User trước khi tạo BUG task (rule §5).
 - Stale IN_PROGRESS do dev nghỉ → bàn giao team lead reassign.
-- DONE chưa verify (BLOCKER) → bàn giao QA (khi vai QA có) hoặc dev cung cấp evidence.
+- DONE chưa verify (BLOCKER) → bàn giao QA `/fare-verify` hoặc dev cung cấp evidence.

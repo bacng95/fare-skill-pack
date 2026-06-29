@@ -5,12 +5,12 @@ description: Xây ma trận truy vết requirement ↔ use_case ↔ user_story �
 
 # fare-traceability — Ma trận truy vết & phát hiện gap
 
-Dùng khi User muốn kiểm: **mọi yêu cầu nghiệp vụ đã có use case / user story / test case / module phủ chưa**, hoặc ngược lại — code/test có đang phục vụ yêu cầu nào không.
+Dùng khi User muốn kiểm: **mọi yêu cầu nghiệp vụ đã có use case / user story / test case / plan item (story) phủ chưa**, hoặc ngược lại — code/test có đang phục vụ yêu cầu nào không.
 
 KHÔNG dùng để: viết spec mới (→ `fare-spec-authoring`); soát blind spot trong 1 spec (→ `fare-spec-reviewer`).
 
 ## Tiền đề
-- Đã có **Bản đồ ngữ cảnh** (`fare-context-discovery`) — biết project / module / artifact mỏ neo.
+- Đã có **Bản đồ ngữ cảnh** (`fare-context-discovery`) — biết project / plan item / artifact mỏ neo.
 - Tuân `rules/fare-rules.md`: §3 Context First (không bịa ID), §7 Content Fidelity (không bịa link trace), §9 (trình bày gọn).
 
 ## Phạm vi truy vết — User chọn
@@ -49,10 +49,10 @@ Quy tắc liên kết:
 4. **Dựng ma trận.** Một bảng cho mỗi cặp lớp; cell ghi ID + URI (hoặc `⚠️ MISSING`).
 5. **Liệt kê gap** ngay dưới ma trận — phân loại theo mức rủi ro (xem dưới).
 6. **Đề xuất hành động** cho mỗi gap (KHÔNG tự thực thi — chờ User chốt, §2; nhiều việc bàn giao vai khác):
-   - Yêu cầu thiếu UC/US → đề xuất `create_document(doc_type="use_case"|"user_story")` (qua `fare-spec-authoring`).
+   - Yêu cầu thiếu UC/US → đề xuất tạo `user_story` (`create_document(doc_type="user_story")`), hoặc đặc tả use-case dạng `richtext` (srs/requirement) — đều qua `fare-spec-authoring`. (Lưu ý: FARE đã bỏ `doc_type="use_case"` để tạo mới — use-case viết bằng richtext, sơ đồ dùng `diagram`.)
    - UC/US thiếu test → bàn giao **QA** `/fare-test` viết TC. Nếu PM cần task chứa TC → bàn giao PM `/fare-breakdown` tạo task `type=TEST` trước.
    - Story thiếu task implement → bàn giao **PM** `/fare-breakdown` (KHÔNG tự `create_tasks` — đó là vai PM).
-   - Spec không gắn module → đề xuất `update_document(plan_item_id=...)`.
+   - Spec không gắn plan item → đề xuất `update_document(plan_item_id=...)`.
    - Task không trỏ doc → bàn giao **PM** `/fare-groom` (PM dùng skill `fare-backlog-grooming` xử lý mồ côi spec).
 
 ## Mức rủi ro gap
@@ -71,12 +71,12 @@ Quy tắc liên kết:
 ## Ma trận truy vết — {phạm vi} ({hướng})
 
 ### 1. Requirement → Use Case / User Story
-| FR ID | Mô tả ngắn | Use Case | User Story | Module |
+| FR ID | Mô tả ngắn | Use Case | User Story | Plan item (story) |
 |---|---|---|---|---|
-| FR-001 | ... | `fare://documents/12` | `fare://documents/45` | M1.1 |
+| FR-001 | ... | `fare://documents/12` | `fare://documents/45` | S43 |
 | FR-002 | ... | ⚠️ MISSING | ⚠️ MISSING | — |
 
-> Ô trỏ tài liệu = **chip mention**: ghi URI trần `fare://documents/{id}` (tự thành chip bấm được), hoặc chip HTML có nhãn riêng — xem `fare-mcp-integration`. KHÔNG dùng markdown link `[..](fare://..)` (không bấm được).
+> Ô trỏ tài liệu = **chip mention**. Nếu ma trận này đẩy lên FARE thành tài liệu (thân richtext) → dùng **chip HTML đầy đủ** `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">{nhãn}</a>` (URI trần KHÔNG tự thành chip trong thân doc — xem `fare-mcp-integration`). Nếu chỉ là báo cáo Markdown trong chat → URI trần `fare://documents/{id}` là đủ. KHÔNG dùng markdown link `[..](fare://..)`.
 
 ### 2. Use Case / Story → Test Case
 | Spec | AC count | Test cases | Phủ |
@@ -97,7 +97,7 @@ Quy tắc liên kết:
 
 ## Gap phát hiện
 🟥 BLOCKER (2):
-- FR-002 không có UC/US — đề xuất tạo use_case "{tên}" trong story S1.1.
+- FR-002 không có UC/US — đề xuất tạo user_story "{tên}" trong story S1.1.
 - S-1.1.2 chưa có task — đề xuất tạo task "Implement cập nhật nhân viên".
 
 🟧 HIGH (1):

@@ -40,7 +40,7 @@ KHÔNG thuộc vai này: viết spec / use case / requirement (→ `fare-busines
 ## Kỹ năng & công cụ
 - `fare-context-discovery` — chạy TRƯỚC mọi việc; biết cây plan item / plan / task hiện có.
 - `fare-task-breakdown` — chia story → task.
-- `fare-effort-estimation` — gán complexity / scope / clarity / effort_est đúng dải ID.
+- `fare-effort-estimation` — story: gán complexity / scope / clarity đúng dải ID; epic: `effort_est_level` (L1-L4). (`effort`/`effort_est` là field dẫn xuất — không set tay.)
 - `fare-plan-versioning` — master vs month plan, DRAFT vs PUBLIC.
 - `fare-backlog-grooming` — quét & xử lý lệch trạng thái + bug triage + task quá hạn.
 - `fare-epic-management` — quản epic như cấp giữa của cây plan item (theme › epic › story) qua `add_plan_item`/`update_plan_item`/`list_plan_items`.
@@ -50,12 +50,15 @@ KHÔNG thuộc vai này: viết spec / use case / requirement (→ `fare-busines
 
 ## Quy trình (SOP)
 1. **Khám phá ngữ cảnh** — `fare-context-discovery` (tầng 4 nhánh "Trạng thái công việc / tiến độ"). Đọc cây plan item + plan hiện có TRƯỚC mọi đề xuất.
-2. **Định tuyến việc** — đối chiếu yêu cầu User với bảng "Khi nào dùng" ở trên → chọn skill phù hợp. Việc đa-bước (vd "đóng sprint cũ + mở sprint mới + breakdown function A,B,C") = chuỗi `fare-backlog-grooming` (close) → `fare-plan-versioning` (mới) → `fare-task-breakdown` × N.
+2. **Định tuyến việc** — đối chiếu yêu cầu User với bảng "Khi nào dùng" ở trên → chọn skill phù hợp. Việc đa-bước (vd "đóng sprint cũ + mở sprint mới + breakdown story A,B,C") = chuỗi `fare-backlog-grooming` (close) → `fare-plan-versioning` (mới) → `fare-task-breakdown` × N.
 3. **Confirmation Gate** (§2) — mọi `create_tasks` / `upsert_plan` / `update_task` (đặc biệt thay đổi trạng thái hoặc xóa) đều trình payload tóm tắt + CHỜ User chốt. Cấm gộp nhiều quyết định vào 1 lệnh.
 4. **Thực thi theo SOP của skill đã chọn.**
 5. **Báo cáo + đề xuất bàn giao** — Markdown gọn (§9): kết quả + bước kế đề xuất + vai nào bàn giao.
 
 ## Ranh giới & phối hợp
+
+- **Nhận đầu vào từ:** `fare-business-analyst` (spec + cây plan đã chốt → chia task, ước effort, đẩy sprint); `fare-qa-engineer` (đề xuất task `TEST`→DONE; BUG cần đẩy sprint); `fare-developer` (effort lệch → re-estimate/groom).
+- **Bàn giao cho:** `fare-business-analyst` (sửa spec / chia cây plan — `/fare-ba` · `/fare-change` · `/fare-plan` · `/fare-trace`); `fare-qa-engineer` (viết / chạy TC — `/fare-test` · `/fare-verify`); `fare-developer` (pickup / code / impact — `/fare-dev` · `/fare-impact`).
 
 | Tình huống | Hành động |
 |---|---|
@@ -82,7 +85,7 @@ KHÔNG thuộc vai này: viết spec / use case / requirement (→ `fare-busines
 
 ## Chống chỉ định (Anti-patterns)
 - ❌ Tự code, tự sửa spec, tự viết test — chỉ chia & track.
-- ❌ Breakdown task khi function chưa có spec — bịa task content vi phạm §7.
+- ❌ Breakdown task khi story chưa có spec — bịa task content vi phạm §7.
 - ❌ `create_tasks` gọi từng phần tử trong vòng lặp — phải batch cả mảng 1 lần (§4).
 - ❌ Title task tiếng Anh hoặc kiểu "Task 1" / "Fix bug" — vi phạm §4 (VN + ngắn gọn + cụ thể).
 - ❌ Description task không URI `fare://documents/{id}` — vi phạm §4.

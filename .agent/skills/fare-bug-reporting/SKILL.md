@@ -124,7 +124,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 
    → Đề xuất tạo BUG task title "[BUG] ..." trên project FARE
      bug_origin=INTRINSIC, linked_task_id=87 (task TEST gốc),
-     severity=major, priority=high, plan_item_id=<function id>.
+     severity=major, priority=high, plan_item_id=<story id>.
      (INTRINSIC sẽ chặn task #87 chuyển DONE đến khi bug đóng.)
 
    Tạo không?
@@ -169,6 +169,6 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 - [ ] Title dạng `[BUG] {hiện tượng cụ thể} — {nơi}`.
 - [ ] Phân biệt severity ↔ priority — không gán giống nhau cơ học.
 - [ ] Đã xác định `bug_origin`: TC fail → INTRINSIC + `linked_task_id` task cha; bug độc lập → EXTRINSIC. Không chắc đã hỏi User.
-- [ ] BUG có `plan_item_id` của function chứa bug (§1).
+- [ ] BUG có `plan_item_id` của story chứa bug (§1).
 - [ ] Sau khi tạo BUG → đã cập nhật TC fail với `linked_task_id=<bug id>` (truy nguồn 2 chiều).
 - [ ] Trường hợp KHÔNG nên tạo BUG (TC viết sai / spec mơ hồ / không reproduce / trùng) → đã chuyển sang hành động đúng.
