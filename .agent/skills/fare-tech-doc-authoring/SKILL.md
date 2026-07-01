@@ -32,7 +32,7 @@ Dùng khi: cần **viết mới** một tài liệu kỹ thuật dạng cấu tr
 ## Sửa sau khi tạo
 - `api_doc` / `erd` (structured) → `edit_document(ops=[{op:"replace_all", content:<FULL JSON mới>}])`. Structured KHÔNG có block op / patch — luôn gửi FULL JSON.
 - `diagram` → `edit_diagram` (KHÔNG `edit_document`).
-- Đổi metadata / move / status → `update_document` (status agent set được chỉ `draft|review`; `approved` là việc của người).
+- Đổi metadata / move / status → `update_document` (status agent set được chỉ `draft|in_review`; `approved` là việc của người).
 
 ## Tự kiểm
 - [ ] `content` là JSON hợp lệ đúng `references/{loại}.md` — đủ field bắt buộc, enum đúng (method / type / relation).

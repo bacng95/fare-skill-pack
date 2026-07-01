@@ -34,11 +34,11 @@ const CANONICAL = new Set([
 
 // Tồn tại nhưng KHÔNG nên dùng nữa → cảnh báo, không fail.
 const DEPRECATED = {
-  patch_document: 'edit_document (block ops y hệt, patch_document chỉ giữ tương thích ngược)',
 };
 
 // Tool ĐỜI CŨ đã bị server FARE gỡ bỏ → fail kèm gợi ý thay thế.
 const REMOVED = {
+  patch_document: 'edit_document (block ops y hệt — patch_document đã gỡ khỏi MCP)',
   add_module: 'add_plan_item (type=theme|epic|story)',
   update_module: 'update_plan_item',
   list_modules: 'list_plan_items',

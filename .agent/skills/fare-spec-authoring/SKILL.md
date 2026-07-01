@@ -45,4 +45,4 @@ Không tự quyết loại — hỏi User. Cùng một tính năng có thể c�
 - [ ] Với `glossary`: đã kiểm tra project chưa có doc nào trùng (1 doc / project).
 - [ ] Với `srs` theo chức năng: viết content use-case trực tiếp + `title` có nghĩa (KHÔNG để trống → mất title + sai format). Với `brd`/`prd`/`srs` cấp hệ thống dùng template: đã `update_document` đặt lại title sau khi tạo.
 - [ ] `title` mọi doc có nghĩa & định vị được — KHÔNG để tên mặc định "SRS"/"BRD"/"PRD" (rule §4).
-- [ ] Doc ở `draft` (mặc định — KHÔNG truyền `status` lúc create). Gửi soát thì `update_document(status="review")`; KHÔNG tự `approved`. Vị trí đã được User chốt (không mặc định).
+- [ ] Doc ở `draft` (mặc định — KHÔNG truyền `status` lúc create). Gửi soát thì `update_document(status="in_review")`; KHÔNG tự `approved`. Vị trí đã được User chốt (không mặc định).

@@ -23,7 +23,7 @@ Hỏi & CHỜ (nếu chưa rõ):
 
 ## Bước 1 — Lấy danh sách & xếp ưu tiên
 
-`list_tasks(projectCode, meta_status="TODO", plan_month_id?, type="TASK")`:
+`list_tasks(projectCode, status="TODO", plan_month_id?, type="TASK")`:
 - KHÔNG mặc định filter `assignee_id` — backlog có thể có task chưa assign mà dev pickup được.
 
 Xếp danh sách theo heuristic (trừ khi User chỉ đích danh):

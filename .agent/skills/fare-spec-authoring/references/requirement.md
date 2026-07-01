@@ -150,5 +150,5 @@ Nêu phương án đề xuất + lý do. ⚠️ Đây CHƯA phải decision — 
 - **MoSCoW** enum cho ưu tiên: `Must | Should | Could | Won't`.
 - **Mục không có nội dung** → BỎ HẲN heading. KHÔNG "N/A".
 - **Vấn đề mở (Open Questions)** — bắt buộc nếu Socratic Gate còn chưa được trả lời. Đừng xóa khi chưa giải quyết.
-- **`status`:** doc mới **mặc định `draft`** (`create_document` KHÔNG nhận param `status`). Gửi soát → `update_document(status="review")`. Enum agent set được qua `update_document` chỉ `draft | review`; `approved` / `archived` là việc của con người (UI), agent KHÔNG set.
+- **`status`:** doc mới **mặc định `draft`** (`create_document` KHÔNG nhận param `status`). Gửi soát → `update_document(status="in_review")`. Enum agent set được qua `update_document` chỉ `draft | in_review`; `approved` / `archived` là việc của con người (UI), agent KHÔNG set.
 - Trung thực §7: yêu cầu nguồn không nêu → ⚠️ + hỏi User, KHÔNG bịa.

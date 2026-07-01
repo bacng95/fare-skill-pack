@@ -65,7 +65,7 @@ Báo cáo `## Impact Assessment` — nhóm theo mức rủi ro 🟥/🟧/🟨 (t
     | yyyy-mm-dd | vN→vN+1 | {tóm tắt diff theo bullet}              | {nguồn ở Bước 1}      |
     ```
   - Structured: nếu schema không có chỗ → ghi log vào 1 `add_comment` của doc (description gắn URI yêu cầu thay đổi).
-- **Status:** giữ `draft` (hoặc `review` qua `update_document(status="review")` nếu User yêu cầu gửi soát). **KHÔNG `approved`** (§7).
+- **Status:** giữ `draft` (hoặc `in_review` qua `update_document(status="in_review")` nếu User yêu cầu gửi soát). **KHÔNG `approved`** (§7).
 - **Publish / bump version:** việc của User — KHÔNG tự gọi tool publish.
 
 ### Sau Bước 5 — Bàn giao downstream

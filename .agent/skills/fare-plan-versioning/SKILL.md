@@ -7,6 +7,10 @@ description: Hiểu & vận hành mô hình Plan của FARE — master plan vs m
 
 Dùng khi: PM cần tạo / cập nhật month plan cho sprint mới, hoặc cần hiểu plan/version trước khi `create_tasks` (vì task có thể gắn `plan_month_id`).
 
+## Tiền đề
+- Chữ ký tool (`list_plans`, `upsert_plan`) & cách gắn `plan_month_id`: xem `fare-mcp-integration` (nguồn chân lý duy nhất về tool).
+- Mọi thao tác ghi (`upsert_plan`) tuân `rules/fare-rules.md` — §2 Confirmation Gate, §4 (chỉ truyền field thay đổi), §7 (publish là quyết định con người).
+
 ## Mô hình Plan của FARE — đọc qua một lần để khỏi nhầm
 
 ```

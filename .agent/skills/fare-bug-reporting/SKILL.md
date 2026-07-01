@@ -115,7 +115,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 2. **Suy luận sơ bộ** (không quá xa — chỉ trên dữ liệu có):
    - Root cause: hệ thống nào lỗi (BE / FE / DB / 3rd party / config)?
    - Plan item (epic/story) / thành phần ảnh hưởng: tra qua `list_tasks` / `code_query` nếu có index code.
-   - Có bug tương tự đang mở? `list_tasks(projectCode, type="BUG", search=...)` — tránh tạo trùng.
+   - Có bug tương tự đang mở? `list_tasks(projectCode, type="BUG", q=...)` — tránh tạo trùng.
 3. **Soạn bản nháp BUG** đầy đủ Steps/Expected/Actual/Evidence/Tham chiếu/Severity/Priority + **`bug_origin` + `linked_task_id`** (nếu INTRINSIC).
 4. **Báo cáo Markdown + HỎI User** (rule §5):
    ```
@@ -163,7 +163,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 ## Tự kiểm
 
 - [ ] Đã có bằng chứng cụ thể (TC fail với actual rõ, hoặc reproduction tay).
-- [ ] Đã kiểm bug tương tự không trùng (`list_tasks(type="BUG", search=...)`).
+- [ ] Đã kiểm bug tương tự không trùng (`list_tasks(type="BUG", q=...)`).
 - [ ] Nháp BUG đầy đủ Steps / Expected / Actual / Env / Evidence / Tham chiếu / Severity / Priority đề xuất.
 - [ ] Đã trình nháp + HỎI User → chờ User xác nhận TRƯỚC khi `create_tasks` (§5).
 - [ ] Title dạng `[BUG] {hiện tượng cụ thể} — {nơi}`.

@@ -42,7 +42,7 @@ Quy tắc liên kết:
    - `use_case`: `read_document(id)` → liệt kê `actors`, `use_cases[].uid`, `flows[]`.
    - `user_story`: `read_document(id)` → liệt kê `stories[].uid` + số `acceptance_criteria`.
 3. **Quét artifact phủ:**
-   - `list_test_cases(projectCode, plan_item_id|document_id)` → ánh xạ theo `linked_uc_uid` / `linked_story_uid` / `linked_ac_uid` (đọc field tham chiếu thực tế qua mô tả tool).
+   - `list_test_cases(projectCode, document_id=...)` rồi `list_test_cases(id=<tcId>)` lấy chi tiết. **TC KHÔNG có field link AC/US/UC cấu trúc** (`linked_ac_uid` v.v. không tồn tại — đã kiểm schema sống). Ánh xạ TC ↔ spec dựng theo 3 nguồn thật: (a) **doc test_case container** gắn `plan_item_id` = story → TC thuộc story nào; (b) **TC→AC mịn**: parse `fare://documents/{us_id} → AC-x` trong `description` của TC (cách `fare-test-authoring` ghi link); (c) **TC→task**: `verify_history[].linked_task_id` và `task.test_case_ids`.
    - `list_tasks(projectCode, plan_item_id)` → quét `description` cho URI `fare://documents/{id}` để xâu task ↔ spec.
    - `list_plan_items(projectCode)` (lọc `type="epic"`) → biết cây theme/epic/story; muốn gom task theo epic: `list_tasks(projectCode, plan_item_ids=[<epicId>], include_descendants=true)`.
    - `search_rag(query="FR-001")` / `search_rag(query="<uc uid>")` — fallback khi link không tường minh.
@@ -101,7 +101,7 @@ Quy tắc liên kết:
 - S-1.1.2 chưa có task — đề xuất tạo task "Implement cập nhật nhân viên".
 
 🟧 HIGH (1):
-- UC-1 thiếu test cho AC-3 — đề xuất create_test_cases (acceptance, linked_ac_uid="ac-3").
+- UC-1 thiếu test cho AC-3 — bàn giao QA `/fare-test` viết TC, ghi link AC vào `description` (`fare://documents/{us_id} → AC-3`). KHÔNG có field `linked_ac_uid` để truyền.
 
 ## Đề xuất hành động — chờ User chốt
 1. {hành động cụ thể} → tool {tên} với payload {tóm tắt}

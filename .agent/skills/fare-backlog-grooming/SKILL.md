@@ -22,10 +22,10 @@ Hỏi & CHỜ:
 
 | Truy vấn | Mục đích |
 |---|---|
-| `list_tasks(projectCode, plan_month_id?, meta_status="IN_PROGRESS")` | Task đang code |
-| `list_tasks(projectCode, plan_month_id?, meta_status="VERIFYING")` | Task chờ verify |
-| `list_tasks(projectCode, plan_month_id?, meta_status="DONE")` | Task đóng — kiểm verify |
-| `list_tasks(projectCode, plan_month_id?, meta_status="TODO", type="TASK")` | Backlog chưa pickup |
+| `list_tasks(projectCode, plan_month_id?, status="IN_PROGRESS")` | Task đang code |
+| `list_tasks(projectCode, plan_month_id?, status="VERIFYING")` | Task chờ verify |
+| `list_tasks(projectCode, plan_month_id?, status="DONE")` | Task đóng — kiểm verify |
+| `list_tasks(projectCode, plan_month_id?, status="TODO", type="TASK")` | Backlog chưa pickup |
 | `list_tasks(projectCode, type="BUG")` | Bug list — không lọc status, để thấy mọi bug đang mở |
 | `list_tasks(projectCode, type="BUG", bug_origin="INTRINSIC")` | Bug nội sinh đang chặn task cha (xem `linked_task_id` để biết chặn task nào) |
 | `list_tasks(projectCode, type="BUG", bug_origin="EXTRINSIC")` | Bug độc lập — triage riêng, không chặn task |
