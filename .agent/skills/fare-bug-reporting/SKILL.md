@@ -115,7 +115,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 2. **Suy luận sơ bộ** (không quá xa — chỉ trên dữ liệu có):
    - Root cause: hệ thống nào lỗi (BE / FE / DB / 3rd party / config)?
    - Plan item (epic/story) / thành phần ảnh hưởng: tra qua `list_tasks` / `code_query` nếu có index code.
-   - Có bug tương tự đang mở? `list_tasks(projectCode, type="BUG", search=...)` — tránh tạo trùng.
+   - Có bug tương tự đang mở? `list_tasks(projectCode, type="BUG", q=...)` — tránh tạo trùng.
 3. **Soạn bản nháp BUG** đầy đủ Steps/Expected/Actual/Evidence/Tham chiếu/Severity/Priority + **`bug_origin` + `linked_task_id`** (nếu INTRINSIC).
 4. **Báo cáo Markdown + HỎI User** (rule §5):
    ```
@@ -124,7 +124,7 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 
    → Đề xuất tạo BUG task title "[BUG] ..." trên project FARE
      bug_origin=INTRINSIC, linked_task_id=87 (task TEST gốc),
-     severity=major, priority=high, plan_item_id=<function id>.
+     severity=major, priority=high, plan_item_id=<story id>.
      (INTRINSIC sẽ chặn task #87 chuyển DONE đến khi bug đóng.)
 
    Tạo không?
@@ -163,12 +163,12 @@ Tránh: `Fix login`, `Bug auth`, `Task 4` — quá mơ hồ (§4).
 ## Tự kiểm
 
 - [ ] Đã có bằng chứng cụ thể (TC fail với actual rõ, hoặc reproduction tay).
-- [ ] Đã kiểm bug tương tự không trùng (`list_tasks(type="BUG", search=...)`).
+- [ ] Đã kiểm bug tương tự không trùng (`list_tasks(type="BUG", q=...)`).
 - [ ] Nháp BUG đầy đủ Steps / Expected / Actual / Env / Evidence / Tham chiếu / Severity / Priority đề xuất.
 - [ ] Đã trình nháp + HỎI User → chờ User xác nhận TRƯỚC khi `create_tasks` (§5).
 - [ ] Title dạng `[BUG] {hiện tượng cụ thể} — {nơi}`.
 - [ ] Phân biệt severity ↔ priority — không gán giống nhau cơ học.
 - [ ] Đã xác định `bug_origin`: TC fail → INTRINSIC + `linked_task_id` task cha; bug độc lập → EXTRINSIC. Không chắc đã hỏi User.
-- [ ] BUG có `plan_item_id` của function chứa bug (§1).
+- [ ] BUG có `plan_item_id` của story chứa bug (§1).
 - [ ] Sau khi tạo BUG → đã cập nhật TC fail với `linked_task_id=<bug id>` (truy nguồn 2 chiều).
 - [ ] Trường hợp KHÔNG nên tạo BUG (TC viết sai / spec mơ hồ / không reproduce / trùng) → đã chuyển sang hành động đúng.

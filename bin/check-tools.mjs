@@ -34,11 +34,11 @@ const CANONICAL = new Set([
 
 // Tồn tại nhưng KHÔNG nên dùng nữa → cảnh báo, không fail.
 const DEPRECATED = {
-  patch_document: 'edit_document (block ops y hệt, patch_document chỉ giữ tương thích ngược)',
 };
 
 // Tool ĐỜI CŨ đã bị server FARE gỡ bỏ → fail kèm gợi ý thay thế.
 const REMOVED = {
+  patch_document: 'edit_document (block ops y hệt — patch_document đã gỡ khỏi MCP)',
   add_module: 'add_plan_item (type=theme|epic|story)',
   update_module: 'update_plan_item',
   list_modules: 'list_plan_items',
@@ -65,6 +65,7 @@ const TOKEN_RE = new RegExp(`\\b${VERB}_[a-z][a-z0-9_]+`, 'g');
 // tránh dương tính giả. add_links/remove_test_case_ids là param của update_task…
 const NON_TOOL = new Set([
   'add_links', 'remove_test_case_ids', 'update_at', 'create_at', 'list_view',
+  'query_params',  // field của schema api_doc (create_document), không phải tool
 ]);
 
 // Chỉ quét tài liệu FARE — bỏ qua skill office (docx/pdf/xlsx) vốn có tên hàm

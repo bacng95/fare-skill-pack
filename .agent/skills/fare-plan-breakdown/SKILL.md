@@ -23,6 +23,12 @@ Cây WBS trả lời "sản phẩm mang lại GIÁ TRỊ gì", KHÔNG phải "co
 - **Theme ≠ Initiative** (mục tiêu chiến lược nhiều quý — quá lớn) và **≠ module kỹ thuật** (nhầm trục).
 - **Task nằm NGOÀI 3 tầng** — task neo vào đúng 1 story (cha = story). Một story đẻ nhiều task ([BE]/[FE]/[QA]…). KHÔNG break task lúc lập plan (xem Quy trình).
 
+## Đừng bê nguyên cách gom nhóm của TÀI LIỆU NGUỒN
+Cấu trúc epic/chương/phần trong BRD/SRS/Excel nguồn thường là **góc trình bày / PM** (theo thứ tự soạn, theo phòng ban, theo màn hình) — KHÔNG phải cấu trúc domain gắn kết. Bê nguyên 9 "epic" của file nguồn ra 9 nhánh = mirror cấu trúc nguồn, phân tích hời hợt.
+- ⚠️ **Bẫy:** nguồn cũng hay đặt tên theo "tính năng/value" → dễ tưởng đã đúng trục giá trị. Phép thử THẬT là **cohesion** (cùng trả lời một câu hỏi nghiệp vụ), KHÔNG phải "nghe giống value".
+- **Re-derive theo cohesion:** 2 yêu cầu cùng trả lời MỘT câu hỏi nghiệp vụ → cùng một nhánh, **dù nằm khác chương nguồn**. (Vd thực tế: Suppression + Preference + Scoring + Hygiene rải 3 epic nguồn nhưng cùng là "sức khỏe danh sách" → gom về 1 epic.)
+- **Chủ động soi chéo:** quét TOÀN BỘ yêu cầu, gom theo *danh từ domain* (đối tượng nhận / nội dung / chiến dịch / theo dõi / quản trị…), rồi đối chiếu với cách nguồn gom — chỗ lệch chính là nơi nguồn gom theo góc PM, cần cắt lại.
+
 ## 3 cấp CỨNG — không vi phạm
 ```
 theme  (type="theme", không parent_id)
@@ -99,6 +105,7 @@ Sai dải / sai cấp = lỗi. Đọc `fare://system-attributes` trước khi tr
 ## Anti-patterns
 - ❌ Tìm tool `add_module`/`update_module`/`list_modules` — đã bị gỡ. Dùng `add_plan_item`/`update_plan_item`/`list_plan_items`. <!-- lint:allow -->
 - ❌ Chia cây theo **trục code** (module kỹ thuật/DDD) thay vì trục giá trị.
+- ❌ **Mirror y nguyên cách gom nhóm (epic/chương) của tài liệu nguồn** — đó là góc PM/trình bày, không phải cohesion domain. Re-derive lại.
 - ❌ **Story là bước kỹ thuật** ("tạo bảng X", "gọi API Y") — đó là task của một story giá trị.
 - ❌ **Story gói nhiều giá trị** (tên có dấu "+" / liệt kê nhiều việc) — tách.
 - ❌ **Tên story mô tả cơ chế** ("quay Draft + báo người tạo") — đổi thành [động từ]+[đối tượng], đẩy chi tiết xuống nghiệm thu.
@@ -112,6 +119,7 @@ Sai dải / sai cấp = lỗi. Đọc `fare://system-attributes` trước khi tr
 ## Tự kiểm
 - [ ] Đã `list_plan_items(projectCode)` trước khi tạo bất cứ thứ gì (§3).
 - [ ] Chia theo trục giá trị, không mirror module code.
+- [ ] Khung nhánh derive theo cohesion domain, KHÔNG copy cách gom của tài liệu nguồn; đã soi FR cùng bản chất nằm rải khác chương.
 - [ ] Mọi Story là đơn vị nghiệm thu được (không phải task); gán được C/S/Cl.
 - [ ] Mọi Story có Epic cha hợp lệ, mọi Epic có Theme cha hợp lệ (đủ đúng 3 tầng).
 - [ ] Nhánh nông: tầng mỏng có tên nhóm giá trị/mảng năng lực THẬT (không tầng giả).

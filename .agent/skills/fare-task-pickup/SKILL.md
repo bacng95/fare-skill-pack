@@ -23,7 +23,7 @@ Hỏi & CHỜ (nếu chưa rõ):
 
 ## Bước 1 — Lấy danh sách & xếp ưu tiên
 
-`list_tasks(projectCode, meta_status="TODO", plan_month_id?, type="TASK")`:
+`list_tasks(projectCode, status="TODO", plan_month_id?, type="TASK")`:
 - KHÔNG mặc định filter `assignee_id` — backlog có thể có task chưa assign mà dev pickup được.
 
 Xếp danh sách theo heuristic (trừ khi User chỉ đích danh):
@@ -89,7 +89,7 @@ Cây WBS: Theme "Quản lý nhân viên" → Epic "Hồ sơ nhân viên" → Sto
 
 User đồng ý → `update_task(taskId, meta_status="IN_PROGRESS", assignee_id=<dev id> nếu chưa assign)`.
 
-Ngay sau đó `add_comment(taskId, comment=<scope>)`:
+Ngay sau đó `add_comment(projectCode, entityType="task", entityId=taskId, content=<scope, HTML>)`:
 ```
 [Pickup] Đang chuẩn bị làm phạm vi:
 - Tạo POST /employees endpoint

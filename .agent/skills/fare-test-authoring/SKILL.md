@@ -19,7 +19,7 @@ KHÔNG thuộc skill này: chạy verify TC (→ `fare-test-execution`); báo bu
 Hỏi & CHỜ:
 - **Spec mục tiêu:** id US / UC / SRS cụ thể. Hoặc id task `type=TEST` từ PM → tra ngược URI spec trong description.
 - **Phạm vi coverage:** *full* (mọi AC + boundary + negative) · *smoke* (chỉ positive flow chính) · *regression* (chỉ AC bị động bởi change-request). Hỏi User.
-- **Doc test_case container:** dùng doc đã có (`list_documents(kind="test_case", plan_item_id=<function>)`) hay tạo mới? Mặc định: 1 doc test_case / 1 function — kiểm trùng trước.
+- **Doc test_case container:** dùng doc đã có (`list_documents(kind="test_case", plan_item_id=<story id>)`) hay tạo mới? Mặc định: 1 doc test_case / 1 story — kiểm trùng trước.
 
 Đọc spec (paginated tới hết):
 - `read_document(id)` — US → `stories[].acceptance_criteria[]`; UC → `flows[]` (main/alt/exception); SRS → bảng FR/NFR.
@@ -85,11 +85,11 @@ Description PHẢI có ≥1 URI spec — KHÔNG để rỗng (vi phạm §4).
 
 ## Bước 3 — Đảm bảo có doc test_case container
 
-`list_documents(projectCode, kind="test_case", plan_item_id=<function id>)`:
-- **Đã có doc test_case cho function này** → dùng `document_id` đó. KHÔNG tạo trùng.
+`list_documents(projectCode, kind="test_case", plan_item_id=<story id>)`:
+- **Đã có doc test_case cho story này** → dùng `document_id` đó. KHÔNG tạo trùng.
 - **Chưa có** → đề xuất + **CHỜ User chốt** (§2):
   ```
-  Tạo doc test_case: title="TC - {Tên function}", plan_item_id=<function>, status=draft
+  Tạo doc test_case: title="TC - {Tên story}", plan_item_id=<story id>
   ```
   Sau khi User chốt → `create_document(doc_type="test_case", title=..., plan_item_id=..., content=[])` với content array rỗng (TC thêm sau qua `create_test_cases`).
 
@@ -165,4 +165,4 @@ Báo gọn:
 - [ ] `description` có URI `fare://documents/{id}` tới AC gốc (§4).
 - [ ] `type` đúng enum ISTQB (positive/negative/boundary/equivalence_class/state_transition/error_guessing — KHÔNG edge_case).
 - [ ] Mỗi TC mapping 1-1 về 1 AC / flow / rule cụ thể (§7).
-- [ ] `status="draft"` (không tự ready). Dùng `create_test_cases` batch.
+- [ ] TC mới để authoring status mặc định `draft` — KHÔNG tự bump `ready` (`create_test_cases` không nhận `status`; đổi qua `update_test_case(status="ready")`). Dùng `create_test_cases` batch.

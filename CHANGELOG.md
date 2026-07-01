@@ -6,6 +6,32 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); vers
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-06-29
+
+> Rà soát chất lượng skill pack đối chiếu trực tiếp với MCP server FARE thật (probe live từng tool/resource). Sửa loạt bug "im lặng" khiến agent gọi MCP fail hoặc tạo artifact không định vị được — không breaking, an toàn nâng cấp từ 2.0.0.
+
+### Added
+- **Skill `fare-tech-doc-authoring`** cho vai `fare-technical-writer` — khuôn JSON cho `api_doc` / `erd` + cách tạo `diagram` (drawio), gồm 3 reference (`api-doc.md` · `erd.md` · `diagram.md`). Trước đây technical-writer không có skill viết tài liệu kỹ thuật nào (chỉ dựa mô tả tool). Wire vào agent + `ARCHITECTURE`.
+- **Nhánh greenfield** trong `fare-context-discovery` — xử lý đầu vào là file ngoài (Word/PDF/Excel) cho feature chưa có trên FARE (không có artifact mỏ neo `read_document`), kèm biến thể mẫu Bản đồ ngữ cảnh.
+- **Tiền điều kiện "project phải tồn tại"** ở `/fare-plan` + `/fare-ba`.
+
+### Fixed
+- **Param `status` lúc `create_document` → lỗi `-32602`** (tool không nhận `status`; doc mặc định `draft`). Bỏ khỏi mọi ví dụ create (spec-authoring, doc-split, test-authoring, technical-writer, business-analyst, workflows). `update_document` status enum đúng là `draft|review` — sửa `in_review` (không tồn tại) ở requirement.md, change-request.
+- **`update_task(actual_effort=…)` → lỗi `-32602`** (tool không có field này; giờ thực tế ghi qua worklog UI). Sửa self-verify, developer, effort-estimation, workflow handoff.
+- **Chữ ký `add_comment` đã đổi** → `(projectCode, entityType, entityId, content-HTML)`. Sửa các ví dụ `add_comment(taskId, comment=…)` ở self-verify, impact-analysis, task-pickup + làm giàu reference trung tâm.
+- **Chip-mention trong THÂN tài liệu richtext:** URI trần `fare://documents/{id}` KHÔNG tự thành chip (lưu thành text thuần — verify round-trip) → bắt buộc chip HTML đầy đủ. Sửa mcp-integration, requirement.md, traceability (phân biệt với `description` task/comment nơi URI trần auto-chip).
+- **SRS theo chức năng:** hướng dẫn cũ (`content` trống → template hệ thống) làm mất title (→ "SRS") + sai format (ISO 29148 generic thay vì use-case của team). Đổi sang viết content use-case trực tiếp + title có nghĩa; cảnh báo template ghi đè title.
+- **Glossary dedup** dùng `list_documents(query=…, kind=…)` — `query` lọc theo tiêu đề nên trượt glossary đặt tên tiếng Việt → bỏ `query`, chỉ `kind="glossary"`.
+- **Thuật ngữ "module"/"Module/Function" đời cũ** còn sót → "plan item (theme/epic/story)" ở traceability, doc-split, backlog-grooming, context-discovery, các workflow (trace/qa/write-doc).
+- **`effort_est` (field dẫn xuất) ghi như set được** → `effort_est_level` (project-manager).
+- **Tàn dư "(khi vai QA được xây)"** (vai QA đã tồn tại) → bàn giao thẳng `/fare-test` `/fare-verify` (spec-reviewer, trace, groom, change-request, task-breakdown).
+- **Ranh giới vai:** Dev được ngụ ý tự cập nhật api_doc/erd (không có tool) → bàn giao technical-writer; `fare-traceability` xếp nhầm vào "skill chính" của QA → bàn giao BA.
+
+### Changed
+- **`fare-plan-breakdown`:** thêm cảnh báo "đừng mirror cách gom nhóm của tài liệu nguồn — regroup theo cohesion domain" (nguồn thường phrasing theo value nên dễ tưởng đúng trục).
+- **Chuẩn hóa khuôn agent** PM/QA/Dev: thêm header "Nhận đầu vào từ / Bàn giao cho" (đồng bộ với BA/technical-writer/spec-reviewer) để soi handoff dễ.
+- **Linter `bin/check-tools.mjs`:** thêm `query_params` (field schema api_doc) vào allowlist `NON_TOOL` — tránh dương tính giả.
+
 ## [2.0.0] - 2026-06-26
 
 > **BREAKING:** đồng bộ với API MCP FARE bản mới — bỏ mô hình Module/Epic đời cũ, đổi tên param `module_id` → `plan_item_id`. Skill/prompt pin theo tên tool hoặc param cũ cần cập nhật.

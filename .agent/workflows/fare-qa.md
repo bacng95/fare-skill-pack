@@ -15,10 +15,10 @@ description: Entry chung cho vai QA — agent route theo việc User nói (viế
 2. Xác định **chế độ vận hành** (`rules/operating-mode.md`) nếu ngữ cảnh chưa rõ.
 3. Agent chạy `fare-context-discovery` (tầng "Trạng thái QA / TC / campaign") — đọc TC hiện có, campaign, task `type=TEST` đang mở.
 4. Agent định tuyến việc User mô tả vào skill phù hợp:
-   - "Viết TC cho [spec / function]" → `fare-test-authoring` (gợi ý gõ `/fare-test`)
+   - "Viết TC cho [spec / story]" → `fare-test-authoring` (gợi ý gõ `/fare-test`)
    - "Chạy verify [doc/campaign/task TEST]" → `fare-test-execution` (gợi ý gõ `/fare-verify`)
    - "Báo bug [hiện tượng]" → `fare-bug-reporting`
-   - "Soát coverage TC cho [module]" → `fare-test-authoring` + bàn giao BA `/fare-trace`
+   - "Soát coverage TC cho [story]" → `fare-test-authoring` + bàn giao BA `/fare-trace`
    - Không rõ → hỏi User chọn 1 trong các việc trên.
 
 ## Khi nào nên gõ workflow khác thay vì /fare-qa

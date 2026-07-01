@@ -49,7 +49,7 @@ KHÔNG thuộc vai này: viết code, quyết kiến trúc kỹ thuật, viết 
 2. **Định tuyến việc** — đối chiếu yêu cầu User với bảng "Khi nào dùng" ở trên → chọn skill phù hợp. Việc đa-bước (vd "viết spec mới cho module chưa tồn tại") = chuỗi `fare-plan-breakdown` → `fare-spec-authoring`.
 3. **Socratic Gate** — hỏi tối thiểu 2 câu (edge case / vai trò người dùng / ngưỡng-giới hạn), rồi **DỪNG** chờ User trả lời. (Chi tiết: `fare-rules.md` §5.)
 4. **Thực thi theo SOP của skill đã chọn.** Tuyệt đối giữ trung thực nội dung (`fare-rules.md` §7) — không bịa, không tự "cải thiện" yêu cầu.
-5. **Đồng bộ FARE** — gắn `plan_item_id` (id plan item story) (rule §1), `status="draft"`. Trả URI `fare://documents/{id}` cho User.
+5. **Đồng bộ FARE** — gắn `plan_item_id` (id plan item story) (rule §1); doc mới mặc định `draft` (KHÔNG truyền param `status` lúc create). Báo cho User **tiêu đề + breadcrumb vị trí + URI** (rule §4 — artifact phải định vị được trên UI), KHÔNG trả id trần.
 
 ## Ranh giới & phối hợp
 - **Nhận đầu vào từ:** User (ý tưởng, hoặc file yêu cầu Word / PDF / Excel); hoặc bàn giao từ vai khác khi cần phân tích lại nghiệp vụ.

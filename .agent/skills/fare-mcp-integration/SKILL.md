@@ -1,6 +1,6 @@
 ---
 name: fare-mcp-integration
-description: Dùng MCP của FARE đúng & an toàn — HỢP ĐỒNG tool canonical (40 tool server thật expose), mô hình plan-item theme/epic/story, các bẫy không hiển nhiên và pattern bắt buộc. Mọi skill khác trỏ về đây để lấy chữ ký tool.
+description: Dùng MCP của FARE đúng & an toàn — HỢP ĐỒNG tool canonical (39 tool server thật expose), mô hình plan-item theme/epic/story, các bẫy không hiển nhiên và pattern bắt buộc. Mọi skill khác trỏ về đây để lấy chữ ký tool.
 ---
 
 # fare-mcp-integration — Hợp đồng MCP FARE
@@ -13,16 +13,16 @@ description: Dùng MCP của FARE đúng & an toàn — HỢP ĐỒNG tool canon
 ## Nguồn canonical: đọc FARE, đừng học theo trí nhớ
 FARE tự mô tả chính nó — luôn đúng theo phiên bản hiện tại:
 - **Mô tả từng tool** — mỗi MCP tool tự kèm schema/tham số chi tiết. Đọc trước khi gọi.
-- **Resource** (đọc trạng thái hệ thống): `fare://projects`, `fare://projects/{code}/knowledge-tree`, `fare://projects/{code}/plan-items`, `fare://documents/{id}`, `fare://documents/{id}/versions`, `fare://system-attributes`, `fare://effort-matrix`.
+- **Resource** (đọc trạng thái hệ thống): `fare://projects`, `fare://projects/{code}/knowledge-tree`, `fare://projects/{code}/plan-items`, `fare://documents/{id}`, `fare://documents/{id}/versions`, `fare://system-attributes`, `fare://effort-matrix`. Hướng dẫn soạn tài liệu (đọc khi cần chi tiết, không nhồi vào schema tool): `fare://document-purposes` (catalogue preset `purpose`), `fare://doc-type-schemas` (JSON shape từng doc_type).
 - Bảng manifest dưới đây là **bản chụp để định hướng** — khi lệch với mô tả tool sống, tin mô tả sống và sửa file này.
 
-## Manifest 40 tool (gom theo miền)
+## Manifest 39 tool (gom theo miền)
 
 | Miền | Tool | Ghi chú nhanh |
 |---|---|---|
 | **Project** | `list_projects` | Bỏ `id` = liệt kê; có `id` = chi tiết 1 project (`include_members`, `include_task_statuses`). |
 | **Tài liệu (đọc/ghi)** | `list_documents`, `read_document`, `create_document`, `edit_document`, `update_document`, `delete_document` | `edit_document` = sửa NỘI DUNG (block ops hoặc `replace_all`). `update_document` = sửa METADATA/vị trí (title/status/purpose/move). `delete_document` = xóa mềm. |
-| | `patch_document` | ⚠️ **DEPRECATED** → dùng `edit_document` (block ops y hệt). | <!-- lint:allow -->
+| | ~~`patch_document`~~ | ❌ **ĐÃ GỠ** khỏi MCP → dùng `edit_document` (block ops y hệt). | <!-- lint:allow -->
 | | `create_suggestion` | Đề xuất sửa 1 block (`node_id`) — không ghi đè. |
 | **Folder** | `manage_folder` | `action: create\|update\|delete` — chỉ phân vùng Custom. `delete` cần `confirm=true`. |
 | **Diagram** | `read_diagram`, `edit_diagram` | doc_type=`diagram` (drawio). Per-cell, lossless. KHÔNG sửa diagram qua edit_document. |
@@ -30,7 +30,7 @@ FARE tự mô tả chính nó — luôn đúng theo phiên bản hiện tại:
 | **Plan / Sprint** | `list_plans`, `upsert_plan` | `list_plans(id=..., include=["versions","commits"])` = chi tiết. `upsert_plan` tạo/sửa month plan. KHÔNG có `get_plan`. | <!-- lint:allow -->
 | **Task** | `list_tasks`, `create_tasks`, `update_task`, `delete_task` | `create_tasks` luôn batch (mảng). `list_tasks(id=...)` = chi tiết 1 task. KHÔNG có `create_task` số ít. | <!-- lint:allow -->
 | **Test case** | `list_test_cases`, `create_test_cases`, `update_test_case` | `create_test_cases` luôn batch. `list_test_cases(id=...)` = chi tiết 1 TC. Ghi verify qua `update_test_case(verify={...})`. KHÔNG có `get_test_case`/`create_test_case` số ít. | <!-- lint:allow -->
-| **Comment** | `add_comment`, `get_comments` | entityType ∈ `document\|task\|plan\|campaign`. |
+| **Comment** | `add_comment`, `get_comments` | `add_comment(projectCode, entityType, entityId, content)` — entityType ∈ `document\|task\|plan\|campaign`; `entityId` = id thực thể; **`content` là HTML** (vd `<p>…</p>`), KHÔNG Markdown. KHÔNG có param `taskId`/`comment`. |
 | **RAG / tìm** | `search_rag` | Search NỘI DUNG đã index (`query` HOẶC `entity_name`). Không match tên doc/folder. |
 | **Code intelligence** | `code_repos`, `code_query`, `code_context`, `code_impact`, `code_route_map`, `code_read_file` | Chỉ project đã index repo. Nhiều repo/branch → `code_repos` trước. |
 | **Ảnh** | `read_image`, `upload_image` | |
@@ -72,10 +72,10 @@ Function" hay "Epic initiative độc lập" của bản cũ.
 - `effort` và `effort_est` là **dẫn xuất** — không bao giờ truyền tay.
 
 ## Link nội bộ giữa tài liệu = chip mention (KHÔNG markdown link)
-Trỏ từ nội dung richtext (thân tài liệu, `description` task…) sang tài liệu/folder khác:
-- **Gọn (auto):** ghi **URI trần** `fare://documents/{id}` (hoặc `fare://folders/{id}`) → frontend tự đổi thành **chip bấm được** (nhãn placeholder `Document #{id}`).
-- **Có nhãn đẹp:** ghi **chip HTML đầy đủ** — `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">{nhãn}</a>` (folder → `data-doc-type="folder"`, `href="/docs?folder={id}"`). ⚠️ **Bắt buộc có `data-type="mention"`** — thiếu nó backend chèn thêm 1 chip resolve nữa → **bị nhân đôi**.
-- ⚠️ **KHÔNG** dùng `[{nhãn}](fare://documents/{id})` (markdown link): thiếu `class="fare-mention"` → frontend bỏ qua, không bấm được.
+Hành vi auto-chip **KHÁC nhau theo ngữ cảnh** (đã kiểm round-trip):
+- **Trong `description` task / `add_comment`:** ghi **URI trần** `fare://documents/{id}` là đủ → backend auto-convert thành chip bấm được (mô tả tool `update_task`/`add_comment`: "auto-chip-converted").
+- **Trong THÂN tài liệu richtext (doc body):** URI trần **KHÔNG** tự thành chip — lưu xong vẫn là **text thuần** (đã kiểm doc 619). PHẢI ghi **chip HTML đầy đủ**: `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">{nhãn}</a>` (folder → `data-doc-type="folder"`, `href="/docs?folder={id}"`). ⚠️ **Bắt buộc có `data-type="mention"`** — thiếu nó backend chèn thêm 1 chip resolve → **bị nhân đôi**.
+- ⚠️ **KHÔNG** dùng `[{nhãn}](fare://documents/{id})` (markdown link): bị rút còn text trần, không bấm được (đã kiểm).
 
 ## Bug INTRINSIC ≠ EXTRINSIC (bug nội sinh vs ngoại lai)
 
@@ -94,10 +94,10 @@ Bug (`type=BUG`) có `bug_origin` quyết định nó có chặn task khác hay 
 ## Bẫy không hiển nhiên
 - **Param sai tên bị REJECT, không bị bỏ qua âm thầm.** Strict validation → key lạ = `-32602 Unrecognized key`. Vd dùng `search=` cho `list_tasks` sai (đúng là `q`). Gặp lỗi: đọc mô tả tool, KHÔNG đoán tên param từ tool khác.
 - **Optional param — KHÔNG truyền `null`.** Field không đổi → bỏ hẳn khỏi payload. Truyền `null` cho field số (`folder_id`, `plan_item_id`…) → lỗi `-32602`.
-- **Sửa nội dung vs vị trí tài liệu:** `edit_document` cho NỘI DUNG (block ops rẻ token, hoặc `replace_all` ghi đè cả doc). `update_document` chỉ METADATA/move (`title`/`status`/`purpose`/`folder_id`/`scope`/`plan_item_id`). `patch_document` cũ đã DEPRECATED. <!-- lint:allow -->
+- **Sửa nội dung vs vị trí tài liệu:** `edit_document` cho NỘI DUNG (block ops rẻ token, hoặc `replace_all` ghi đè cả doc). `update_document` chỉ METADATA/move (`title`/`status`/`purpose`/`folder_id`/`scope`/`plan_item_id`). `patch_document` đã bị GỠ khỏi MCP. <!-- lint:allow -->
 - **Folder & vị trí tài liệu:** `manage_folder` (create/update/delete, Custom only). `create_document` có `path` cũng mkdir -p (khớp chính xác `(tên, cha, scope)`, lệch → folder trùng; đã có → dùng `folder_id`). Folder chỉ tồn tại ở phân vùng Custom; Project & Module phẳng.
 - **`search_rag` chỉ search NỘI DUNG** đã index — không match tên doc/folder. Tra theo tên → `list_documents(query=...)`; duyệt cây → resource `knowledge-tree`.
-- **`status`:** agent chỉ set `draft`/`review`. `approved`/`archived` là quyết định con người (rule §7).
+- **`status`:** agent chỉ set `draft`/`in_review`. `approved`/`archived` là quyết định con người (rule §7).
 - **Phiên bản tài liệu:** `read_document(documentId)` = bản hiện tại; `read_document(documentId, version=n)` = version cụ thể; danh sách version = resource `fare://documents/{id}/versions`. KHÔNG tự chế `?version=`.
 - **Structured doc** (`user_story`/`api_doc`/`erd`/`glossary`/`test_case`): content là JSON đúng schema. Sửa → `read_document` lấy bản hiện tại → `edit_document(replace_all)` gửi lại FULL JSON.
 

@@ -106,7 +106,7 @@ Lý do: signature đổi → 3 caller d=1 phải sửa; 1 trên route `/api/logi
 
 ### Bước 6 — Cập nhật task
 
-`add_comment(taskId, comment=<impact report tóm tắt>)` — để mọi người (cả PM/QA) thấy mức rủi ro & phương án dev chọn:
+`add_comment(projectCode, entityType="task", entityId=taskId, content=<impact report tóm tắt, HTML>)` — để mọi người (cả PM/QA) thấy mức rủi ro & phương án dev chọn:
 ```
 [Impact] validateUser — HIGH (3 d=1 callers, 2 flows).
 Phương án chốt: (1) backward-compatible overload — không break caller cũ.

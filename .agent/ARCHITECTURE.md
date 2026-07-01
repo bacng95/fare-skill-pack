@@ -32,7 +32,7 @@
 | `fare-project-manager` | Chia story thành task; ước effort (FP); tạo & cập nhật month plan; grooming backlog; triage bug | context-discovery, mcp-integration, task-breakdown, effort-estimation, plan-versioning, backlog-grooming |
 | `fare-qa-engineer` | Viết test case từ AC; chạy verify atomic; báo bug reproducible (qua §5) | context-discovery, mcp-integration, test-authoring, test-execution, bug-reporting |
 | `fare-developer` | Pickup task; impact analysis qua code intelligence; self-verify & handoff với evidence. KHÔNG tự code (§8) | context-discovery, mcp-integration, task-pickup, impact-analysis, self-verify |
-| `fare-technical-writer` | Viết tài liệu kỹ thuật (api_doc, erd, diagram, specification) | context-discovery, mcp-integration |
+| `fare-technical-writer` | Viết tài liệu kỹ thuật (api_doc, erd, diagram, specification) | context-discovery, mcp-integration, tech-doc-authoring |
 | `fare-spec-reviewer` | Soát spec đã có — 6 lăng kính (gồm UI/UX vs Figma) | context-discovery, mcp-integration |
 
 ## Skills (23)
@@ -46,7 +46,7 @@
 **Vai BA**
 | Skill | Việc |
 |---|---|
-| `fare-spec-authoring` | Viết MỚI đặc tả — use_case · user_story · richtext (BRD/SRS/PRD/requirement/analysis/meeting-notes) · glossary |
+| `fare-spec-authoring` | Viết MỚI đặc tả — user_story · richtext (BRD/SRS/PRD/requirement/analysis/meeting-notes; use-case viết dạng richtext) · glossary |
 | `fare-doc-split` | Tách tài liệu nguyên khối thành nhiều doc (trung thực) |
 | `fare-doc-normalize` | Làm sạch form bản nháp local trước khi đẩy FARE |
 | `fare-plan-breakdown` | Chia cây plan item theme › epic › story (3 cấp, BA-light) — trục giá trị |
@@ -76,6 +76,11 @@
 | `fare-task-pickup` | Chọn task hợp lý + load spec + IN_PROGRESS với comment scope |
 | `fare-impact-analysis` | Blast radius qua `code_query/context/impact/route_map`; HIGH/CRITICAL chờ User chốt phương án |
 | `fare-self-verify` | DoD checklist + evidence (commit, file đụng, TC chạy tay) + VERIFYING |
+
+**Vai technical-writer**
+| Skill | Việc |
+|---|---|
+| `fare-tech-doc-authoring` | Viết MỚI `api_doc` / `erd` (JSON đúng schema) + tạo `diagram` (drawio) |
 
 **Tiện ích đọc file đầu vào**
 | Skill | Việc |
@@ -171,7 +176,7 @@ File đầu vào (docs/inputs/)
 | Grooming backlog / triage bug / epic risk scan | `/fare-groom` |
 | Thêm / sửa epic trong cây plan item | `/fare-epic` |
 | Status snapshot project | `/fare-pm` (default) |
-| Viết test case cho 1 spec / function | `/fare-test` |
+| Viết test case cho 1 spec / story | `/fare-test` |
 | Chạy verify 1 round TC, ghi pass/fail | `/fare-verify` |
 | Báo bug khi test fail | `/fare-verify` (inline) hoặc `/fare-qa` |
 | Pickup task tiếp theo / hỏi "tôi nên làm gì" | `/fare-dev` |

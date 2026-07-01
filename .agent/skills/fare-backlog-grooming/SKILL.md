@@ -1,6 +1,6 @@
 ---
 name: fare-backlog-grooming
-description: Review backlog định kỳ — quét task lệch trạng thái (IN_PROGRESS không activity, DONE chưa verify, TODO không owner / quá hạn), bug triage (sắp xếp severity / assign), phát hiện task mồ côi (không module / không spec). Đề xuất hành động sửa và CHỜ User chốt — KHÔNG tự đổi trạng thái hàng loạt.
+description: Review backlog định kỳ — quét task lệch trạng thái (IN_PROGRESS không activity, DONE chưa verify, TODO không owner / quá hạn), bug triage (sắp xếp severity / assign), phát hiện task mồ côi (không plan item / không spec). Đề xuất hành động sửa và CHỜ User chốt — KHÔNG tự đổi trạng thái hàng loạt.
 ---
 
 # fare-backlog-grooming — Grooming backlog
@@ -22,10 +22,10 @@ Hỏi & CHỜ:
 
 | Truy vấn | Mục đích |
 |---|---|
-| `list_tasks(projectCode, plan_month_id?, meta_status="IN_PROGRESS")` | Task đang code |
-| `list_tasks(projectCode, plan_month_id?, meta_status="VERIFYING")` | Task chờ verify |
-| `list_tasks(projectCode, plan_month_id?, meta_status="DONE")` | Task đóng — kiểm verify |
-| `list_tasks(projectCode, plan_month_id?, meta_status="TODO", type="TASK")` | Backlog chưa pickup |
+| `list_tasks(projectCode, plan_month_id?, status="IN_PROGRESS")` | Task đang code |
+| `list_tasks(projectCode, plan_month_id?, status="VERIFYING")` | Task chờ verify |
+| `list_tasks(projectCode, plan_month_id?, status="DONE")` | Task đóng — kiểm verify |
+| `list_tasks(projectCode, plan_month_id?, status="TODO", type="TASK")` | Backlog chưa pickup |
 | `list_tasks(projectCode, type="BUG")` | Bug list — không lọc status, để thấy mọi bug đang mở |
 | `list_tasks(projectCode, type="BUG", bug_origin="INTRINSIC")` | Bug nội sinh đang chặn task cha (xem `linked_task_id` để biết chặn task nào) |
 | `list_tasks(projectCode, type="BUG", bug_origin="EXTRINSIC")` | Bug độc lập — triage riêng, không chặn task |
@@ -43,7 +43,7 @@ Với mỗi task `IN_PROGRESS`: `list_tasks(id=<id>)` lấy chi tiết + comment
 | **Skip lifecycle** | Lịch sử nhảy `TODO → DONE` không qua `IN_PROGRESS`/`VERIFYING` | 🟥 BLOCKER — vi phạm §6 |
 | **Quá hạn** | `end_at < hôm nay` mà `meta_status ≠ DONE` | 🟧 HIGH |
 | **Mồ côi spec** | `description` không có URI `fare://documents/{id}` | 🟨 MEDIUM — vi phạm §4 |
-| **Mồ côi module** | `plan_item_id` rỗng / không hợp lệ | 🟥 BLOCKER — vi phạm §1 (nhưng FARE schema cấm, hiếm gặp) |
+| **Task mồ côi (thiếu plan item)** | `plan_item_id` rỗng / không hợp lệ | 🟥 BLOCKER — vi phạm §1 (nhưng FARE schema cấm, hiếm gặp) |
 | **TODO bỏ quên** | `created_at` > 14 ngày mà vẫn `TODO`, không assignee | 🟨 MEDIUM — backlog có khả năng outdated |
 | **Bug chưa triage** | `type=BUG` không có `severity` hoặc `priority` | 🟧 HIGH |
 | **Bug stuck** | `type=BUG` `severity=blocker` mà `TODO` > 24h | 🟥 BLOCKER |

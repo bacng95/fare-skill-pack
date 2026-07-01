@@ -10,6 +10,9 @@ description: Dựng / hoàn thiện cây plan item theme › epic › story (3 c
 **Đầu vào người dùng:** $ARGUMENTS
 **Agent phụ trách:** `fare-business-analyst` (chạy skill `fare-plan-breakdown`).
 
+## Tiền điều kiện
+- **Project phải tồn tại** (User đưa được project code, `list_projects` thấy). Tạo project là việc người (trên UI FARE — xem ARCHITECTURE) → chưa có thì **DỪNG**, đề nghị User tạo project rồi đưa code. KHÔNG tự bịa/khởi tạo project.
+
 ## Luồng
 1. Kích hoạt agent `fare-business-analyst`.
 2. Xác định **chế độ vận hành** (`rules/operating-mode.md`) nếu ngữ cảnh chưa rõ.

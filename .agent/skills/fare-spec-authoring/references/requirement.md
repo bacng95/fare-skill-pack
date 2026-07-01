@@ -4,14 +4,39 @@
 
 `create_document(doc_type="richtext", purpose=<chọn dưới>, content=<Markdown>)` — `content_format` FARE tự set `tiptap`.
 
-> Mẹo: với `purpose ∈ {srs, brd, prd}` FARE có **template hệ thống**. Tạo doc với `content` bỏ trống → FARE tự inject khuôn chuẩn (ISO 29148 / BABOK v3 / Cagan). Sau đó dùng `edit_document` điền nội dung từng block. Tránh việc tự gõ lại template.
+> ## ⚠️ SRS theo chức năng (case hay gặp NHẤT) → viết content trực tiếp, ĐỪNG để trống
+>
+> Đặc tả SRS cho **một chức năng/màn hình cụ thể** (gắn `plan_item_id` cấp story) — team viết theo **format use-case** (Tổng quan / Luồng chính / Hậu điều kiện / Quy tắc nghiệp vụ). Khuôn đầy đủ: **`../../fare-doc-normalize/references/use-case-spec.md`** (cùng khuôn normalize dùng — viết mới & làm sạch ra cùng một dạng). Với case này:
+> - **TỰ viết `content` Markdown** theo khuôn use-case-spec + **truyền `title` có nghĩa** ("SRS - {Tên chức năng}"). KHÔNG để `content` trống.
+> - **TUYỆT ĐỐI KHÔNG** dùng template hệ thống cho case này: template `srs` là khung ISO 29148 cấp hệ thống (generic, NFR ISO 25010…) — KHÁC format use-case của team, và **ghi đè `title` thành "SRS"** (lấy H1 template) → doc trùng tên, không định vị được trên UI (rule §4).
+>
+> Mẫu use-case rút gọn (chi tiết + quy tắc trình bày: xem `use-case-spec.md`):
+> ```markdown
+> # {số} {Tên chức năng}
+>
+> ## Tổng quan
+> - **Mô tả:** … · **Tác nhân:** … · **Tiền điều kiện:** …
+>
+> ## Luồng chính
+> **Bước 1:** …
+>
+> **Bước 2:** …   ← mỗi "Bước N" là MỘT đoạn, cách nhau dòng trống
+>
+> ## Hậu điều kiện
+> …
+>
+> ## Quy tắc nghiệp vụ
+> - …
+> ```
+
+> Mẹo (chỉ cho SRS/BRD/PRD **cấp hệ thống/dự án**, KHÔNG cho SRS-theo-chức-năng ở trên): FARE có **template hệ thống** (ISO 29148 / BABOK v3 / Cagan). Tạo doc với `content` bỏ trống → FARE inject khuôn chuẩn, rồi `edit_document` điền từng block. **Lưu ý:** template ghi đè `title` thành tên mặc định ("SRS"/"BRD"/"PRD") — sau khi tạo phải `update_document(title=...)` đặt lại tên có nghĩa, kẻo không định vị được trên UI (rule §4).
 
 ## Chọn purpose — KHÔNG dùng chung
 
 | purpose | Audience chính | Khi nào | Có template hệ thống? |
 |---|---|---|---|
 | `brd` | Sponsor / stakeholder kinh doanh | Business need ở cấp khởi tạo dự án — "vấn đề gì, vì sao làm, đo bằng KPI nào" (theo IIBA BABOK v3) | ✅ Có |
-| `srs` | Engineering team | Yêu cầu phần mềm chi tiết, testable, gồm NFR theo ISO 25010 (theo ISO/IEC/IEEE 29148:2018) | ✅ Có |
+| `srs` | Engineering team | **Theo chức năng** (gắn story) → format use-case, tự viết content (xem ô ⚠️ trên). **Cấp hệ thống** → khung ISO 29148, NFR ISO 25010 | ✅ Có (chỉ cấp hệ thống) |
 | `prd` | Product / Eng / Design / GTM | Yêu cầu sản phẩm theo style Cagan/SVPG — outcome + metric + scope MoSCoW | ✅ Có |
 | `requirement` | Mọi vai | **Fallback** khi chưa rõ là BRD/SRS/PRD, hoặc yêu cầu nhẹ. Khi nội dung trưởng thành → đổi `purpose` cho đúng audience | ❌ Không |
 | `analysis` | BA / kiến trúc | Nghiên cứu / so sánh phương án (CHƯA phải decision) — khác `adr` | ❌ Không |
@@ -19,11 +44,13 @@
 
 KHÔNG tự quyết — hỏi User chọn 1 trong các purpose ở trên (Socratic Gate §5).
 
-## Quy trình ưu tiên (khi có template hệ thống)
+## Quy trình ưu tiên — template hệ thống (CHỈ cho BRD/PRD, hoặc SRS cấp hệ thống)
+> KHÔNG dùng cho SRS-theo-chức-năng — case đó viết content use-case trực tiếp (ô ⚠️ ở đầu file).
 1. `create_document(doc_type="richtext", purpose="<srs|brd|prd>")` — bỏ `content` để FARE inject template.
-2. `read_document(id)` — đọc lại các block (dùng `mode="blocks"` để có ID ổn định).
-3. `edit_document(id, ops=[...])` — điền từng block (replace text trong placeholder `<...>`).
-4. Mục nào yêu cầu không có → **xóa hẳn block** đó. KHÔNG để lại "N/A" hay placeholder trống.
+2. `update_document(id, title="...")` — **đặt lại title** (template đã ghi đè thành "SRS"/"BRD"/"PRD"; tên mặc định = không định vị được trên UI, rule §4).
+3. `read_document(id, mode="blocks")` — đọc lại các block (có ID ổn định).
+4. `edit_document(id, ops=[...])` — điền từng block (replace text trong placeholder `<...>`).
+5. Mục nào yêu cầu không có → **xóa hẳn block** đó. KHÔNG để lại "N/A" hay placeholder trống.
 
 ## Khi không có template (`requirement` / `analysis` / `meeting-notes`)
 
@@ -31,7 +58,7 @@ Phải tự cung cấp `content` Markdown. Khuôn rút gọn tham khảo dưới
 
 ### `purpose=requirement` — Yêu cầu chung (fallback)
 ```markdown
-# {Tên tính năng / module}
+# {Tên tính năng / phân hệ}
 
 ## 1. Mục tiêu nghiệp vụ
 Vấn đề kinh doanh đang giải quyết + kết quả kỳ vọng (đo được).
@@ -61,7 +88,7 @@ Vấn đề kinh doanh đang giải quyết + kết quả kỳ vọng (đo đư�
 - **Khả dụng:** {uptime / RTO / RPO}
 
 ## 7. Phụ thuộc & Tài liệu liên quan
-- `fare://documents/{id}` — {tên doc}, vai trò. *(URI trần tự thành chip mention bấm được; muốn nhãn riêng → chip HTML `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">…</a>` — phải đủ `data-type="mention"` kẻo bị nhân đôi; xem `fare-mcp-integration`. KHÔNG markdown link.)*
+- {tên doc}, vai trò → **chip HTML đầy đủ**: `<a class="fare-mention" data-type="mention" data-id="{id}" data-doc-type="richtext" href="/docs/{id}">{tên doc}</a>`. *(Đây là THÂN tài liệu → URI trần `fare://documents/{id}` KHÔNG tự thành chip, chỉ là text thuần; phải đủ `data-type="mention"` kẻo bị nhân đôi; xem `fare-mcp-integration`. KHÔNG markdown link.)*
 
 ## 8. Vấn đề mở
 - ⚠️ {câu hỏi chờ stakeholder trả lời}
@@ -123,5 +150,5 @@ Nêu phương án đề xuất + lý do. ⚠️ Đây CHƯA phải decision — 
 - **MoSCoW** enum cho ưu tiên: `Must | Should | Could | Won't`.
 - **Mục không có nội dung** → BỎ HẲN heading. KHÔNG "N/A".
 - **Vấn đề mở (Open Questions)** — bắt buộc nếu Socratic Gate còn chưa được trả lời. Đừng xóa khi chưa giải quyết.
-- **`status`:** `draft` khi viết xong; `in_review` khi gửi soát (FARE enum `draft | in_review | approved | outdated | archived` — agent chỉ set `draft` / `in_review`, KHÔNG `approved`).
+- **`status`:** doc mới **mặc định `draft`** (`create_document` KHÔNG nhận param `status`). Gửi soát → `update_document(status="in_review")`. Enum agent set được qua `update_document` chỉ `draft | in_review`; `approved` / `archived` là việc của con người (UI), agent KHÔNG set.
 - Trung thực §7: yêu cầu nguồn không nêu → ⚠️ + hỏi User, KHÔNG bịa.

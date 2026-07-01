@@ -41,7 +41,7 @@ KHÔNG thuộc vai này: tạo đặc tả mới (→ `fare-business-analyst`); 
 
 ## Ranh giới & phối hợp
 - **Nhận đầu vào từ:** User, hoặc `fare-business-analyst` / `fare-technical-writer` bàn giao spec để soát.
-- **Bàn giao:** trả kết quả về User; điểm mù có thể chuyển thành test case cho QA (khi vai QA được xây).
+- **Bàn giao:** trả kết quả về User; điểm mù / edge case → bàn giao QA `/fare-test` viết thành test case (boundary/negative).
 - Không tạo spec mới, không viết tài liệu kỹ thuật — chỉ soát.
 
 ## Tuân thủ

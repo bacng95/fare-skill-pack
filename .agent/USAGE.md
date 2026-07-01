@@ -21,7 +21,7 @@ Trong mọi workflow, các tham số trong `[...]` đều thuộc một trong c�
 |---|---|---|
 | `[project]` hoặc `[mã project]` | **Mã project** trên FARE — chuỗi viết hoa duy nhất do người tạo project đặt (vd `FARE`, `CRM`, `EDTECH`) | Xem trên giao diện FARE góc trên, hoặc gõ `list_projects` |
 | `[id doc]` / `[id spec]` | **ID số của tài liệu** | URL doc trên FARE có dạng `fare://documents/245` → ID là `245`. Hoặc `list_documents` |
-| `[id module]` / `[id function]` | **ID số của plan item (theme/epic/story)** | `list_plan_items` hoặc resource `fare://projects/{project}/plan-items` |
+| `[id plan item]` / `[id story]` | **ID số của plan item (theme/epic/story)** | `list_plan_items` hoặc resource `fare://projects/{project}/plan-items` |
 | `[tên ...]` | **Chuỗi tự do** mô tả việc (vd "Quản lý nhân viên") | Bạn tự đặt — agent dùng để khoanh phạm vi |
 | `"[mô tả ...]"` | Chuỗi dài có dấu cách → **bọc trong dấu ngoặc kép** | Bạn tự viết |
 | `?` ở cuối tham số | **Tùy chọn** — có thể bỏ qua, agent sẽ hỏi nếu cần | — |
@@ -78,9 +78,9 @@ Trong mọi workflow, các tham số trong `[...]` đều thuộc một trong c�
 ### Vai PM — chia task & track tiến độ
 | Bạn muốn… | Gõ workflow | Hoặc nói (Cách 2) |
 |---|---|---|
-| Chia 1 function (đã có spec) thành nhiều task | `/fare-breakdown [project] [id function]` | "Chia task cho function ..." |
+| Chia 1 story (đã có spec) thành nhiều task | `/fare-breakdown [project] [id story]` | "Chia task cho story ..." |
 | Tạo month plan / sprint mới | `/fare-pm [project] tạo sprint tháng X` | "Mở sprint mới cho tháng 5" |
-| Ước effort cho module / function | `/fare-pm [project] ước effort module ...` | "Ước effort cho module ..." |
+| Ước effort cho epic / story | `/fare-pm [project] ước effort epic/story ...` | "Ước effort cho story ..." |
 | Status snapshot project (PM standup) | `/fare-pm [project]` | "Status sprint hiện tại" |
 | Grooming backlog (cuối ngày / cuối sprint) | `/fare-groom [project]` | "Soát backlog dùm" |
 | Triage bug (gán severity / assignee) | `/fare-groom [project] - bug-triage` | "Triage bug đang mở" |
@@ -91,7 +91,7 @@ Trong mọi workflow, các tham số trong `[...]` đều thuộc một trong c�
 ### Vai QA — viết test & verify
 | Bạn muốn… | Gõ workflow | Hoặc nói (Cách 2) |
 |---|---|---|
-| Viết test case cho 1 spec / function | `/fare-test [project] [id spec hoặc task TEST]` | "Viết TC cho user story ..." |
+| Viết test case cho 1 spec / story | `/fare-test [project] [id spec hoặc task TEST]` | "Viết TC cho user story ..." |
 | Chạy verify 1 round TC | `/fare-verify [project] [scope] [env]` | "Verify TC trong doc test_case 245 trên staging" |
 | Báo bug khi test fail | `/fare-verify` (inline) hoặc `/fare-qa [project] báo bug ...` | "Report bug login crash" |
 | Soát coverage TC cho 1 module | `/fare-qa [project] soát coverage module ...` | "Module này TC đủ chưa" |

@@ -13,16 +13,16 @@ description: Entry chung cho vai PM — agent route theo việc User nói (statu
 ## Luồng
 1. Kích hoạt agent `fare-project-manager`.
 2. Xác định **chế độ vận hành** (`rules/operating-mode.md`) nếu ngữ cảnh chưa rõ.
-3. Agent chạy `fare-context-discovery` tầng "Trạng thái công việc / tiến độ" — đọc plan + module + task hiện có.
+3. Agent chạy `fare-context-discovery` tầng "Trạng thái công việc / tiến độ" — đọc plan + plan item + task hiện có.
 4. Agent định tuyến việc User mô tả vào skill phù hợp:
    - "Tạo sprint mới / month plan tháng X" → `fare-plan-versioning`
    - "Ước effort cho epic/story Y" → `fare-effort-estimation`
-   - "Chia task cho function Z" → `fare-task-breakdown` (gợi ý gõ `/fare-breakdown` cho rõ)
+   - "Chia task cho story Z" → `fare-task-breakdown` (gợi ý gõ `/fare-breakdown` cho rõ)
    - "Cho tôi status sprint / health-check / grooming" → `fare-backlog-grooming` (gợi ý gõ `/fare-groom`)
    - Không rõ → hỏi User chọn 1 trong các việc trên.
 
 ## Khi nào nên gõ workflow khác thay vì /fare-pm
-- Đã rõ việc là **breakdown function cụ thể** → gõ thẳng `/fare-breakdown [project] [function id]` — đỡ 1 round-trip route.
+- Đã rõ việc là **breakdown story cụ thể** → gõ thẳng `/fare-breakdown [project] [story id]` — đỡ 1 round-trip route.
 - Đã rõ việc là **grooming cuối sprint** → gõ thẳng `/fare-groom [project]`.
 - Cần **viết / sửa spec** → KHÔNG dùng `/fare-pm`; dùng `/fare-ba` hoặc `/fare-change` (vai BA).
 
